@@ -1,0 +1,10 @@
+{
+  "name": "PixelBoof",
+  "description": "Transform yourself into a nostolgic character in sticker form.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

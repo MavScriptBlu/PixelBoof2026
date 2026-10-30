@@ -1,0 +1,38 @@
+{
+  "name": "pixelboof",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx server.ts",
+    "build": "vite build",
+    "start": "node server.ts",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/express": "^5.0.6",
+    "@types/nodemailer": "^8.0.2",
+    "auto-zustand-selectors-hook": "latest",
+    "express": "^5.3.0",
+    "firebase": "^13.1.0",
+    "gifenc": "latest",
+    "immer": "latest",
+    "jszip": "latest",
+    "lodash.shuffle": "latest",
+    "nodemailer": "^10.2.1",
+    "p-limit": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
