@@ -327,9 +327,6 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 disabled={isInitializingCamera}
                 className="flex flex-col items-center justify-center gap-5 p-6 cursor-pointer group"
               >
-                <span className="pixel-font text-[9px] sm:text-[10px] text-sky-300 bg-[#151928]/90 border border-[#334155] px-3 py-1.5 tracking-wider">
-                  🍄 DEFAULT LENS: {curModeObj.name.toUpperCase()}
-                </span>
                 <h1 className="pixel-font text-2xl sm:text-4xl md:text-5xl text-[#facc15] drop-shadow-[4px_4px_0_#9f1239] group-hover:scale-105 transition-transform">
                   PIXEL BOOF
                 </h1>
