@@ -5,6 +5,7 @@
 
 import {useStore} from '../../lib/store'
 import {THEMES} from '../../lib/modes'
+import {PixelCloseButton} from '../common/PixelUI'
 
 export default function ModeSelector({
   customPrompt,
@@ -14,8 +15,7 @@ export default function ModeSelector({
 }) {
   const activeTheme = useStore.useActiveTheme()
   const activeMode = useStore.useActiveMode()
-  const instantTransform = useStore.useInstantTransform()
-  const {setTheme, setMode, setInstantTransform} = useStore.getState()
+  const {setTheme, setMode} = useStore.getState()
 
   const currentModes = THEMES[activeTheme]?.modes || []
 
@@ -33,34 +33,30 @@ export default function ModeSelector({
       onClick={onClose}
     >
       <div
-        className="pixel-box bg-[#1d1526] border-[#ffcc00] max-w-2xl w-full p-3.5 sm:p-5 max-h-[88dvh] flex flex-col overflow-hidden rounded-t-2xl sm:rounded-none"
+        className="pixel-box bg-[#151928] border-[#facc15] max-w-2xl w-full p-3.5 sm:p-5 max-h-[88dvh] flex flex-col overflow-hidden rounded-t-2xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
         {/* Drawer Header */}
-        <div className="flex items-center justify-between gap-2 pb-2.5 mb-3 border-b-2 border-[#8B1E41] shrink-0">
+        <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b-2 border-[#334155] shrink-0">
           <div>
-            <h2 className="pixel-font text-[10px] sm:text-xs text-[#ffcc00]">
+            <h2 className="pixel-font text-[10px] sm:text-xs text-[#facc15]">
               🎨 CHOOSE PIXEL LENS OR CUSTOM PROMPT
             </h2>
-            <p className="text-[11px] text-slate-300 mt-0.5">
+            <p className="text-[11px] text-slate-300 mt-1">
               Tap a category deck below, then pick any character lens!
             </p>
           </div>
-          <button
-            type="button"
+          <PixelCloseButton
             onClick={onClose}
-            className="pixel-btn w-9 h-9 bg-[#120d18] text-white flex items-center justify-center text-xs shrink-0"
-            aria-label="Close lens drawer"
-          >
-            ✕
-          </button>
+            ariaLabel="Close lens drawer"
+          />
         </div>
 
         {/* Scrollable Drawer Body */}
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-0.5">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-3.5 pr-0.5">
           {/* Category Deck Tabs + Random + Custom */}
           <div>
-            <span className="pixel-font text-[8px] text-cyan-300 block mb-1.5">
+            <span className="pixel-font text-[8px] text-sky-300 block mb-2">
               1. LENS CATEGORY DECKS:
             </span>
             <div
@@ -82,8 +78,8 @@ export default function ModeSelector({
                     onClick={() => setTheme(key)}
                     className={`pixel-btn text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[42px] flex items-center justify-start gap-2 ${
                       isAct
-                        ? 'bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00]'
-                        : 'bg-[#120d18] text-slate-200 border-[#4a304d] hover:border-[#ffcc00]'
+                        ? 'bg-[#9f1239] text-[#facc15] border-[#facc15]'
+                        : 'bg-[#0f1320] text-slate-200 border-[#334155] hover:border-[#facc15]'
                     }`}
                   >
                     <span className="text-base">{theme.emoji}</span>
@@ -94,15 +90,15 @@ export default function ModeSelector({
             </div>
 
             {/* Special Modes: Random & Custom Prompt */}
-            <div className="grid grid-cols-2 gap-1.5 mt-1.5">
+            <div className="grid grid-cols-2 gap-1.5 mt-2">
               <button
                 id="btn-mode-random"
                 type="button"
                 onClick={() => handleSelectLens('random')}
                 className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[42px] flex items-center justify-center gap-1.5 ${
                   activeMode === 'random'
-                    ? 'bg-[#ffcc00] text-[#120d18] border-white'
-                    : 'bg-[#2b1d38] text-white border-[#6b4c70] hover:border-[#ffcc00]'
+                    ? 'bg-[#facc15] text-[#0b0e17] border-white'
+                    : 'bg-[#1e2538] text-slate-100 border-[#475569] hover:border-[#facc15]'
                 }`}
               >
                 <span>❓</span>
@@ -114,8 +110,8 @@ export default function ModeSelector({
                 onClick={() => setMode('custom')}
                 className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[42px] flex items-center justify-center gap-1.5 ${
                   activeMode === 'custom'
-                    ? 'bg-[#ffcc00] text-[#120d18] border-white'
-                    : 'bg-[#2b1d38] text-white border-[#6b4c70] hover:border-[#ffcc00]'
+                    ? 'bg-[#facc15] text-[#0b0e17] border-white'
+                    : 'bg-[#1e2538] text-slate-100 border-[#475569] hover:border-[#facc15]'
                 }`}
               >
                 <span>✏️</span>
@@ -128,10 +124,10 @@ export default function ModeSelector({
           {activeMode === 'custom' ? (
             <div
               id="custom-prompt-box"
-              className="bg-[#120d18] border-2 border-[#ffcc00] p-3 space-y-2"
+              className="bg-[#0b0e17] border-2 border-[#facc15] p-3 space-y-2.5"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="pixel-font text-[8px] text-[#ffcc00]">
+                <span className="pixel-font text-[8px] text-[#facc15]">
                   ✏️ WRITE YOUR CUSTOM STICKER PROMPT:
                 </span>
                 {onOpenChatHelper && (
@@ -141,7 +137,7 @@ export default function ModeSelector({
                       if (onClose) onClose()
                       onOpenChatHelper()
                     }}
-                    className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#23192d] text-cyan-300 border-cyan-400"
+                    className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#1e2538] text-sky-300 border-sky-400"
                   >
                     🤖 Ask PixelBot for Ideas
                   </button>
@@ -153,12 +149,12 @@ export default function ModeSelector({
                 value={customPrompt}
                 onChange={e => onCustomPromptChange(e.target.value)}
                 placeholder="e.g. Turn me into a 16-bit pixel art cyberpunk knight holding a neon laser sword..."
-                className="w-full bg-[#1d1526] border border-slate-500 focus:border-[#ffcc00] text-white text-xs p-2.5 focus:outline-none resize-none"
+                className="w-full bg-[#151928] border-2 border-[#334155] focus:border-[#facc15] text-white text-xs p-2.5 focus:outline-none resize-none"
               />
               <button
                 type="button"
                 onClick={onClose}
-                className="pixel-btn w-full py-2.5 min-h-[42px] bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00] text-[9px] justify-center"
+                className="pixel-btn w-full py-2.5 min-h-[42px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] text-[9px] justify-center"
               >
                 ✅ USE THIS CUSTOM PROMPT
               </button>
@@ -166,7 +162,7 @@ export default function ModeSelector({
           ) : (
             /* Preset Lenses Grid for Active Category */
             <div>
-              <span className="pixel-font text-[8px] text-[#ffcc00] block mb-1.5">
+              <span className="pixel-font text-[8px] text-[#facc15] block mb-2">
                 2. PICK A {THEMES[activeTheme]?.shortName?.toUpperCase() || 'LENS'}{' '}
                 STYLE:
               </span>
@@ -184,8 +180,8 @@ export default function ModeSelector({
                         aria-pressed={isSel}
                         className={`pixel-btn w-full text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] flex items-center justify-start gap-1.5 ${
                           isSel
-                            ? 'bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00]'
-                            : 'bg-[#261b30] text-slate-100 border-[#4d3352] hover:border-white'
+                            ? 'bg-[#9f1239] text-[#facc15] border-[#facc15]'
+                            : 'bg-[#1a2033] text-slate-100 border-[#334155] hover:border-[#94a3b8]'
                         }`}
                       >
                         <span className="text-base shrink-0">{m.emoji}</span>
@@ -197,26 +193,6 @@ export default function ModeSelector({
               </ul>
             </div>
           )}
-        </div>
-
-        {/* Drawer Footer: Instant vs Preview Toggle */}
-        <div className="pt-2.5 mt-2.5 border-t border-[#3b2032] flex items-center justify-between gap-2 shrink-0">
-          <span className="text-[11px] text-slate-300">
-            Shutter Behavior:
-          </span>
-          <button
-            type="button"
-            onClick={() => setInstantTransform(!instantTransform)}
-            className={`pixel-btn text-[8px] px-3 py-1.5 min-h-[34px] ${
-              instantTransform
-                ? 'bg-emerald-800 text-white border-emerald-400'
-                : 'bg-[#120d18] text-amber-300 border-amber-400'
-            }`}
-          >
-            {instantTransform
-              ? '⚡ Instant Large Sticker (Default)'
-              : '👁️ Preview Before Transform'}
-          </button>
         </div>
       </div>
     </div>

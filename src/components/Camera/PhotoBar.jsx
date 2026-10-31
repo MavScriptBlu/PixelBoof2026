@@ -38,11 +38,17 @@ export default function PhotoBar({onPhotoClick}) {
                 aria-label={`View sticker ${id}`}
                 className={`w-full h-full border-2 ${
                   inQ
-                    ? 'border-[#ffcc00]'
+                    ? 'border-[#facc15]'
                     : isBusy
-                      ? 'border-[#06b6d4]'
-                      : 'border-[#6b4c70] hover:border-white'
-                } bg-[#120d18] overflow-hidden relative cursor-pointer flex items-center justify-center`}
+                      ? 'border-sky-400'
+                      : 'border-[#475569] hover:border-white'
+                } bg-[#0b0e17] overflow-hidden relative cursor-pointer flex items-center justify-center p-0.5`}
+                style={{
+                  backgroundImage:
+                    'linear-gradient(45deg, #131826 25%, transparent 25%), linear-gradient(-45deg, #131826 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #131826 75%), linear-gradient(-45deg, transparent 75%, #131826 75%)',
+                  backgroundSize: '10px 10px',
+                  backgroundPosition: '0 0, 0 5px, 5px -5px, -5px 0'
+                }}
               >
                 {imgSrc && (
                   <img
@@ -55,12 +61,12 @@ export default function PhotoBar({onPhotoClick}) {
                   />
                 )}
                 {isBusy && (
-                  <div className="absolute inset-0 bg-[#120d18]/75 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-[#0b0e17]/80 flex items-center justify-center">
                     <PixelLoader size="sm" />
                   </div>
                 )}
                 {inQ && !isBusy && (
-                  <span className="absolute top-0 right-0 text-[8px] bg-[#ffcc00] text-black font-black px-0.5 leading-tight">
+                  <span className="absolute top-0 right-0 text-[8px] bg-[#facc15] text-black font-black px-0.5 leading-tight">
                     ★
                   </span>
                 )}

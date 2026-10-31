@@ -15,7 +15,8 @@ export default function PhotoThumbnail({photo, onClick}) {
   const {id, mode, isBusy} = photo
 
   const inQ = stickerQueue.includes(id)
-  const m = modes[mode] || modes['8bit'] || {name: 'Custom', emoji: '✏️'}
+  const m =
+    modes[mode] || modes['mario'] || modes['8bit'] || {name: 'Custom', emoji: '✏️'}
   const imgSrc = isBusy
     ? imageData.inputs[id]
     : imageData.outputs[id] || imageData.inputs[id]
@@ -34,13 +35,19 @@ export default function PhotoThumbnail({photo, onClick}) {
 
   return (
     <li
-      className={`pixel-box bg-[#1d1526] p-2 relative flex flex-col ${
-        inQ ? 'border-[#ffcc00]' : 'border-slate-600'
+      className={`pixel-box bg-[#151928] p-2 relative flex flex-col ${
+        inQ ? 'border-[#facc15]' : 'border-[#334155]'
       }`}
     >
       <div
         onClick={() => onClick()}
-        className="aspect-square bg-[#120d18] flex items-center justify-center p-1.5 cursor-pointer relative overflow-hidden"
+        className="aspect-square bg-[#0b0e17] flex items-center justify-center p-2 cursor-pointer relative overflow-hidden"
+        style={{
+          backgroundImage:
+            'linear-gradient(45deg, #131826 25%, transparent 25%), linear-gradient(-45deg, #131826 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #131826 75%), linear-gradient(-45deg, transparent 75%, #131826 75%)',
+          backgroundSize: '16px 16px',
+          backgroundPosition: '0 0, 0 8px, 8px -8px, -8px 0'
+        }}
       >
         {imgSrc && (
           <img
@@ -53,27 +60,32 @@ export default function PhotoThumbnail({photo, onClick}) {
           />
         )}
         {isBusy && (
-          <div className="absolute inset-0 bg-[#120d18]/75 flex items-center justify-center">
+          <div className="absolute inset-0 bg-[#0b0e17]/80 flex items-center justify-center">
             <PixelLoader size="lg" />
           </div>
         )}
-        <span className="absolute bottom-1 right-1.5 text-base">{m.emoji}</span>
         {inQ && !isBusy && (
-          <span className="absolute top-1.5 left-1.5 pixel-font text-[7px] bg-[#ffcc00] text-black px-1.5 py-0.5">
+          <span className="absolute top-1.5 left-1.5 pixel-font text-[7px] bg-[#facc15] text-black px-1.5 py-0.5">
             ★ QUEUED
           </span>
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-1 mt-2">
+      <div className="flex items-center justify-between gap-1 mt-1.5 px-0.5">
+        <span className="pixel-font text-[7px] text-slate-300 truncate">
+          {m.emoji} {m.name}
+        </span>
+      </div>
+
+      <div className="flex items-center justify-between gap-1 mt-1.5">
         <button
           type="button"
           disabled={isBusy}
           onClick={handleToggleQueue}
           className={`pixel-btn text-[7px] sm:text-[8px] px-2 py-1.5 min-h-[34px] flex-1 justify-center truncate ${
             inQ
-              ? 'bg-emerald-700 text-white border-white'
-              : 'bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00]'
+              ? 'bg-emerald-700 text-white border-emerald-300'
+              : 'bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]'
           }`}
         >
           {isBusy ? (
@@ -97,7 +109,7 @@ export default function PhotoThumbnail({photo, onClick}) {
         <button
           type="button"
           onClick={handleDelete}
-          className="pixel-btn text-[9px] px-2 py-1.5 min-h-[34px] bg-[#120d18] text-rose-400 border-rose-400/60"
+          className="pixel-btn text-[9px] px-2 py-1.5 min-h-[34px] bg-[#0f1320] text-rose-400 border-rose-400/60"
           title="Delete photo"
         >
           🗑️

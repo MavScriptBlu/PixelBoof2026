@@ -5,6 +5,7 @@
 
 import {useState, useRef, useEffect} from 'react'
 import {useStore, CHAT_PERSONAS} from '../../lib/store'
+import {MstcBadge} from '../common/PixelUI'
 
 const MODEL_OPTIONS = [
   {
@@ -81,19 +82,19 @@ export default function ChatBotPanel({onNavigateToStudio}) {
   }
 
   return (
-    <section className="flex-1 min-h-0 flex flex-col max-w-4xl w-full mx-auto bg-[#140f1d] sm:border-x-2 border-[#3b2032] shadow-2xl overflow-hidden">
+    <section className="flex-1 min-h-0 flex flex-col max-w-4xl w-full mx-auto bg-[#0b0e17] sm:border-x-2 border-[#334155] shadow-2xl overflow-hidden">
       {/* Top Chat Control Header */}
       <div
-        className="px-3 sm:px-4 py-2.5 border-b-2 border-[#ffcc00] flex flex-col gap-2 shrink-0"
+        className="px-3 sm:px-4 py-2.5 border-b-2 border-[#facc15] flex flex-col gap-2 shrink-0"
         style={{
-          background: 'linear-gradient(90deg, #5e112b 0%, #8B1E41 55%, #2b0f26 100%)'
+          background: 'linear-gradient(90deg, #131829 0%, #7f1030 55%, #131829 100%)'
         }}
       >
         <div className="flex items-center justify-between gap-2 pr-10">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-lg shrink-0">🤖</span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <MstcBadge size="sm" />
             <div className="min-w-0">
-              <h2 className="pixel-font text-xs sm:text-sm text-[#ffcc00] truncate">
+              <h2 className="pixel-font text-xs sm:text-sm text-[#facc15] truncate">
                 PIXELBOT AI COACH
               </h2>
               <p className="text-[11px] text-slate-200 truncate">
@@ -105,17 +106,17 @@ export default function ChatBotPanel({onNavigateToStudio}) {
           <button
             type="button"
             onClick={clearChatHistory}
-            className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#120d18] text-rose-300 border-rose-400 shrink-0"
+            className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#0f1320] text-rose-300 border-rose-400 shrink-0"
             title="Clear conversation history"
           >
             🗑️ Reset
           </button>
         </div>
 
-        {/* Model Selector & Role Persona Selector (Wraps cleanly without horizontal scrollbar) */}
+        {/* Model Selector & Role Persona Selector */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-white/15">
           <div className="flex flex-wrap items-center gap-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#ffcc00] mr-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#facc15] mr-1">
               Model:
             </span>
             {MODEL_OPTIONS.map(m => {
@@ -127,8 +128,8 @@ export default function ChatBotPanel({onNavigateToStudio}) {
                   onClick={() => setChatModel(m.id)}
                   className={`px-2 py-1 rounded text-[11px] font-bold border transition cursor-pointer whitespace-nowrap flex items-center gap-1 ${
                     isAct
-                      ? 'bg-[#ffcc00] text-[#140f1d] border-white shadow-sm'
-                      : 'bg-[#120d18]/90 text-slate-200 border-slate-600 hover:border-[#ffcc00]'
+                      ? 'bg-[#facc15] text-[#0b0e17] border-white shadow-sm'
+                      : 'bg-[#0f1320]/90 text-slate-200 border-slate-600 hover:border-[#facc15]'
                   }`}
                   title={`${m.sub} — ${m.desc}`}
                 >
@@ -144,7 +145,7 @@ export default function ChatBotPanel({onNavigateToStudio}) {
           <div className="flex items-center gap-1.5">
             <label
               htmlFor="chat-persona-select"
-              className="text-[10px] font-bold uppercase tracking-wider text-cyan-300 shrink-0"
+              className="text-[10px] font-bold uppercase tracking-wider text-sky-300 shrink-0"
             >
               Role:
             </label>
@@ -152,7 +153,7 @@ export default function ChatBotPanel({onNavigateToStudio}) {
               id="chat-persona-select"
               value={chatPersona}
               onChange={e => setChatPersona(e.target.value)}
-              className="bg-[#120d18] border border-cyan-400/70 text-white text-xs font-semibold rounded px-2 py-1 cursor-pointer"
+              className="bg-[#0f1320] border border-sky-400/70 text-white text-xs font-semibold rounded px-2 py-1 cursor-pointer"
             >
               {Object.values(CHAT_PERSONAS).map(p => (
                 <option key={p.id} value={p.id}>
@@ -165,7 +166,7 @@ export default function ChatBotPanel({onNavigateToStudio}) {
       </div>
 
       {/* Scrollable Message Thread */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#110c19]">
+      <div className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#0b0e17]">
         {chatMessages.map(msg => {
           const isUser = msg.role === 'user'
           const suggestedPrompts = !isUser ? extractQuotedPrompts(msg.text) : []
@@ -178,23 +179,18 @@ export default function ChatBotPanel({onNavigateToStudio}) {
               <div
                 className={`max-w-[90%] sm:max-w-[80%] p-3 pixel-box ${
                   isUser
-                    ? 'bg-[#8B1E41] text-white border-[#ffcc00]'
-                    : 'bg-[#1d1526] text-slate-100 border-slate-500'
+                    ? 'bg-[#9f1239] text-white border-[#facc15]'
+                    : 'bg-[#151928] text-slate-100 border-[#334155]'
                 }`}
               >
                 <div className="flex items-center justify-between gap-3 mb-1 text-[10px] text-slate-300">
-                  <span className="font-bold text-[#ffcc00]">
+                  <span className="font-bold text-[#facc15]">
                     {isUser
                       ? '🧑 You'
                       : `${CHAT_PERSONAS[chatPersona]?.emoji || '🤖'} ${
                           CHAT_PERSONAS[chatPersona]?.name || 'PixelBot'
                         }`}
                   </span>
-                  {!isUser && msg.modelUsed && (
-                    <span className="font-mono text-[9px] text-cyan-300">
-                      {msg.modelUsed}
-                    </span>
-                  )}
                 </div>
 
                 <div className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">
@@ -203,18 +199,18 @@ export default function ChatBotPanel({onNavigateToStudio}) {
 
                 {suggestedPrompts.length > 0 && (
                   <div className="mt-2.5 pt-2 border-t border-white/15 space-y-1.5">
-                    <span className="pixel-font text-[8px] text-[#06b6d4] block">
-                      1-CLICK GENERATE WITH GEMINI-NANO-BANANA-2.1:
+                    <span className="pixel-font text-[8px] text-sky-300 block">
+                      1-CLICK GENERATE STICKER:
                     </span>
                     {suggestedPrompts.map((pText, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleQuickGenerate(pText)}
-                        className="w-full text-left p-2 bg-[#120d18] hover:bg-[#261a34] border border-[#ffcc00] text-xs text-[#ffcc00] flex items-center justify-between gap-2 transition cursor-pointer"
+                        className="w-full text-left p-2 bg-[#0b0e17] hover:bg-[#1e2538] border border-[#facc15] text-xs text-[#facc15] flex items-center justify-between gap-2 transition cursor-pointer"
                       >
                         <span className="truncate">&ldquo;{pText}&rdquo;</span>
-                        <span className="pixel-font text-[8px] bg-[#8B1E41] text-white px-2 py-1 shrink-0">
+                        <span className="pixel-font text-[8px] bg-[#9f1239] text-white px-2 py-1 shrink-0">
                           ✨ Create
                         </span>
                       </button>
@@ -228,26 +224,24 @@ export default function ChatBotPanel({onNavigateToStudio}) {
 
         {chatLoading && (
           <div className="flex items-start">
-            <div className="pixel-box bg-[#1d1526] border-[#06b6d4] px-4 py-3 text-xs text-cyan-300 flex items-center gap-2">
+            <div className="pixel-box bg-[#151928] border-sky-400 px-4 py-3 text-xs text-sky-300 flex items-center gap-2">
               <span className="caret-blink pixel-font text-[10px]">▋</span>
-              <span>
-                PixelBot is thinking with <strong>{chatModel}</strong>...
-              </span>
+              <span>PixelBot is thinking...</span>
             </div>
           </div>
         )}
         <div ref={scrollEndRef} />
       </div>
 
-      {/* Quick Starter Chips (Wrapped, zero horizontal scrollbar) */}
-      <div className="px-2.5 py-1.5 bg-[#161020] border-t border-[#3b2032] flex flex-wrap items-center gap-1.5 shrink-0">
+      {/* Quick Starter Chips */}
+      <div className="px-2.5 py-1.5 bg-[#131826] border-t border-[#334155] flex flex-wrap items-center gap-1.5 shrink-0">
         {QUICK_STARTERS.map((q, i) => (
           <button
             key={i}
             type="button"
             disabled={chatLoading}
             onClick={() => sendChatMessage(q)}
-            className="px-2 py-1 bg-[#23192d] hover:bg-[#8B1E41] text-slate-200 hover:text-white border border-[#4d3352] hover:border-[#ffcc00] text-[10px] sm:text-[11px] font-medium transition cursor-pointer"
+            className="px-2 py-1 bg-[#1e2538] hover:bg-[#9f1239] text-slate-200 hover:text-white border border-[#334155] hover:border-[#facc15] text-[10px] sm:text-[11px] font-medium transition cursor-pointer"
           >
             💬 {q}
           </button>
@@ -257,19 +251,19 @@ export default function ChatBotPanel({onNavigateToStudio}) {
       {/* Message Input Form */}
       <form
         onSubmit={handleSubmit}
-        className="p-2.5 bg-[#1d1526] border-t-2 border-[#f7f7f7] flex items-center gap-2 shrink-0"
+        className="p-2.5 bg-[#151928] border-t-2 border-[#334155] flex items-center gap-2 shrink-0"
       >
         <input
           type="text"
           value={input}
           onChange={e => setInput(e.target.value)}
           placeholder="Ask PixelBot for sticker prompts, image edits, or booth help..."
-          className="flex-1 bg-[#120d18] border-2 border-slate-500 focus:border-[#ffcc00] px-3 py-2 min-h-[42px] text-xs sm:text-sm text-white outline-none"
+          className="flex-1 bg-[#0b0e17] border-2 border-[#334155] focus:border-[#facc15] px-3 py-2 min-h-[42px] text-xs sm:text-sm text-white outline-none"
         />
         <button
           type="submit"
           disabled={chatLoading || !input.trim()}
-          className="pixel-btn text-[9px] px-3.5 py-2 min-h-[42px] bg-[#8B1E41] hover:bg-[#a6244d] text-[#ffcc00] shrink-0"
+          className="pixel-btn text-[9px] px-3.5 py-2 min-h-[42px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] shrink-0"
         >
           {chatLoading ? '...' : 'SEND ➤'}
         </button>

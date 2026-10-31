@@ -19,7 +19,7 @@ export const ORGANIZER_EMAIL = 'mavscriptblue@gmail.com'
 const modeKeys = Object.keys(modes)
 
 const stickerPromptSuffix =
-  'The final image should be a die-cut sticker of the character with a thick white border, isolated on a flat black background, with no drop shadow.'
+  'The final image MUST be a single die-cut sticker of the character with a thick solid white sticker border (#FFFFFF) surrounding the entire subject, isolated on a flat pure black (#000000) background, with no drop shadow, no watermarks, no text, and no logos.'
 
 export const CHAT_PERSONAS = {
   coach: {
@@ -59,7 +59,7 @@ const useStoreBase = create(
     didInit: false,
     photos: [],
     activeTheme: 'arcade',
-    activeMode: '8bit',
+    activeMode: 'mario',
     lensesCollapsed: false,
     showLensDrawer: false,
     focusedPhotoId: null,
@@ -83,6 +83,7 @@ const useStoreBase = create(
     instantTransform: true,
     errorMessage: null,
     toastInfo: null,
+    confirmModal: null,
 
     // --- MULTI-TURN CHATBOT STATE (Budget-Protected Flash Lite Default) --- //
     chatModel: 'gemini-3.1-flash-lite',
@@ -197,7 +198,7 @@ const useStoreBase = create(
         const promptText =
           effectiveMode === 'custom'
             ? customPrompt
-            : modes[effectiveMode]?.prompt || modes['8bit'].prompt
+            : modes[effectiveMode]?.prompt || modes['mario'].prompt
 
         const result = await gen({
           model: IMAGE_MODEL,
@@ -225,7 +226,7 @@ const useStoreBase = create(
       } catch (error) {
         console.error('Photo generation failed:', error)
         get().setErrorMessage('Oh no! The pixels got crossed. Please try again.')
-        get().deletePhoto(id)
+        get().confirmDeletePhoto(id)
       }
     },
 
@@ -296,7 +297,7 @@ const useStoreBase = create(
       } catch (error) {
         console.error('Create/Edit image failed:', error)
         get().setErrorMessage('Could not generate or edit image. Please try again.')
-        get().deletePhoto(id)
+        get().confirmDeletePhoto(id)
         return null
       }
     },
@@ -318,7 +319,7 @@ const useStoreBase = create(
         const {aspectRatio, imageSize} = get()
         const result = await gen({
           model: IMAGE_MODEL,
-          prompt: `${editInstruction.trim()}. Keep the die-cut sticker style with a thick white border on a flat black background.`,
+          prompt: `${editInstruction.trim()}. Keep the die-cut sticker style with a thick solid white border isolated on a flat pure black background, with no watermarks, no text, and no drop shadow.`,
           inputFile: currentImg,
           aspectRatio,
           imageSize,
@@ -430,13 +431,21 @@ const useStoreBase = create(
     setChatModel: modelName => set({chatModel: modelName}),
     setChatPersona: personaKey => set({chatPersona: personaKey}),
 
+    openConfirmModal: payload => set({confirmModal: payload}),
+    closeConfirmModal: () => set({confirmModal: null}),
+
     deletePhoto: id => {
+      set({confirmModal: {type: 'delete_photo', photoId: id}})
+    },
+
+    confirmDeletePhoto: id => {
       set(state => {
         state.photos = state.photos.filter(photo => photo.id !== id)
         state.stickerQueue = state.stickerQueue.filter(stickerId => stickerId !== id)
         if (state.focusedPhotoId === id) {
           state.focusedPhotoId = null
         }
+        state.confirmModal = null
       })
       delete imageData.inputs[id]
       delete imageData.outputs[id]
@@ -501,11 +510,23 @@ const useStoreBase = create(
     },
 
     clearStickerQueue: () => {
-      set({stickerQueue: []})
+      if (get().stickerQueue.length === 0) {
+        get().showToast('Sticker queue is already empty (0/3).')
+        return
+      }
+      set({confirmModal: {type: 'clear_queue'}})
+    },
+
+    confirmClearStickerQueue: () => {
+      set({stickerQueue: [], confirmModal: null})
       get().showToast('Cleared sticker queue (0/3).')
     },
 
     resetStationForNextAttendee: () => {
+      set({confirmModal: {type: 'reset_station'}})
+    },
+
+    confirmResetStationForNextAttendee: () => {
       const currentPhotos = get().photos
       currentPhotos.forEach(p => {
         delete imageData.inputs[p.id]
@@ -520,6 +541,7 @@ const useStoreBase = create(
         state.focusedPhotoId = null
         state.showLensDrawer = false
         state.lastEmailResult = null
+        state.confirmModal = null
         state.currentView = 'camera'
         state.cameraSessionKey += 1
       })
@@ -533,8 +555,7 @@ const useStoreBase = create(
      */
     processStickerBatch: async ({
       downloadLocal = false,
-      autoEmail = true,
-      shareOnMobile = false
+      autoEmail = true
     } = {}) => {
       const {stickerQueue, photos, attendeeName, attendeeSchool} = get()
 
@@ -565,7 +586,6 @@ const useStoreBase = create(
 
       try {
         const zip = new JSZip()
-        const shareFiles = []
 
         for (let i = 0; i < targetIds.length; i++) {
           const id = targetIds[i]
@@ -575,9 +595,6 @@ const useStoreBase = create(
             const blob = await response.blob()
             const pngName = `${prefix}_sticker_${i + 1}.png`
             zip.file(pngName, blob)
-            if (typeof File !== 'undefined') {
-              shareFiles.push(new File([blob], pngName, {type: 'image/png'}))
-            }
           }
         }
 
@@ -595,7 +612,7 @@ const useStoreBase = create(
           URL.revokeObjectURL(url)
         }
 
-        // 2. Send the ZIP batch to mavscriptblue@gmail.com via backend
+        // 2. Auto-send the ZIP batch directly to mavscriptblue@gmail.com via backend (no extra OS share popups)
         if (autoEmail) {
           const zipBase64 = await blobToBase64(zipBlob)
           const res = await fetch('/api/email-sticker-batch', {
@@ -627,23 +644,6 @@ const useStoreBase = create(
               timestamp: Date.now()
             }
           })
-        }
-
-        // 3. Optional native mobile share sheet for personal phones
-        if (
-          shareOnMobile &&
-          typeof navigator !== 'undefined' &&
-          navigator.canShare &&
-          shareFiles.length > 0 &&
-          navigator.canShare({files: shareFiles})
-        ) {
-          await navigator
-            .share({
-              title: `${rawName} (${rawSchool}) — PixelBoof Stickers`,
-              text: `PixelBoof stickers for ${rawName} (${rawSchool}) — Send to ${ORGANIZER_EMAIL}`,
-              files: shareFiles
-            })
-            .catch(() => {})
         }
 
         if (downloadLocal && autoEmail) {

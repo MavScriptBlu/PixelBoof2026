@@ -9,22 +9,12 @@ import modes, {THEMES} from '../../lib/modes'
 import {transformPhotoToPixelSticker} from '../../lib/gemini'
 import ModeSelector from './ModeSelector'
 import PhotoBar from './PhotoBar'
-import ZoomControls from './ZoomControls'
 import PixelLoader from '../common/PixelLoader'
 
 const captureCanvas = document.createElement('canvas')
 const captureCtx = captureCanvas.getContext('2d')
 
-const getDistance = touches => {
-  const [touch1, touch2] = touches
-  return Math.sqrt(
-    Math.pow(touch2.clientX - touch1.clientX, 2) +
-      Math.pow(touch2.clientY - touch1.clientY, 2)
-  )
-}
-
 export default function CameraView({onPhotoClick, onOpenChatHelper}) {
-  const zoom = useStore.useZoom()
   const activeMode = useStore.useActiveMode()
   const activeTheme = useStore.useActiveTheme()
   const showTutorial = useStore.useShowTutorial()
@@ -35,10 +25,10 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
   const cameraSessionKey = useStore.useCameraSessionKey()
 
   const {
-    setZoom,
     snapPhoto,
     setCapturedPreview,
     setShowLensDrawer,
+    openConfirmModal,
     showToast
   } = useStore.getState()
 
@@ -54,8 +44,6 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const fileInputRef = useRef(null)
-  const pinchStartZoomRef = useRef(1)
-  const initialPinchDistRef = useRef(0)
 
   const stopVideo = useCallback(() => {
     if (streamRef.current) {
@@ -151,7 +139,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
     const themeModes = THEMES[activeTheme]?.modes || THEMES.arcade.modes
     const previewModeKey =
       activeMode === 'random'
-        ? themeModes[0]?.key || '8bit'
+        ? themeModes[0]?.key || 'mario'
         : activeMode
 
     transformPhotoToPixelSticker(
@@ -222,7 +210,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
     captureCanvas.width = squareSize
     captureCanvas.height = squareSize
 
-    const sourceSize = Math.min(videoWidth, videoHeight) / zoom
+    const sourceSize = Math.min(videoWidth, videoHeight)
     const sourceX = (videoWidth - sourceSize) / 2
     const sourceY = (videoHeight - sourceSize) / 2
 
@@ -279,24 +267,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
   }
 
   const handleRetake = () => {
-    setCapturedPreview(null)
-  }
-
-  const handleVideoTouchStart = e => {
-    if (e.touches.length === 2) {
-      initialPinchDistRef.current = getDistance(e.touches)
-      pinchStartZoomRef.current = zoom
-    }
-  }
-
-  const handleVideoTouchMove = e => {
-    if (e.touches.length === 2) {
-      e.preventDefault()
-      const newDist = getDistance(e.touches)
-      const scale = newDist / initialPinchDistRef.current
-      const newZoom = pinchStartZoomRef.current * scale
-      setZoom(Math.max(1, Math.min(newZoom, 3)))
-    }
+    openConfirmModal({type: 'retake_preview'})
   }
 
   const curModeObj =
@@ -304,7 +275,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
       ? {name: 'Random', emoji: '❓'}
       : activeMode === 'custom'
         ? {name: 'Custom', emoji: '✏️'}
-        : modes[activeMode] || modes['8bit']
+        : modes[activeMode] || modes['mario'] || modes['8bit']
 
   const isDuoMode = ['shipcouple', 'fantasymates', 'moonlightpair'].includes(
     activeMode
@@ -323,12 +294,8 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
         onChange={handleFileUpload}
       />
 
-      {/* FULL-BLEED CAMERA / HOMEPAGE / CAPTURED PREVIEW VIEWPORT (80%+ of screen height) */}
-      <div
-        className="relative flex-1 min-h-0 bg-gradient-to-b from-[#09060e] to-[#1a1126] flex items-center justify-center overflow-hidden"
-        onTouchStart={handleVideoTouchStart}
-        onTouchMove={handleVideoTouchMove}
-      >
+      {/* FULL-BLEED CAMERA / HOMEPAGE / CAPTURED PREVIEW VIEWPORT */}
+      <div className="relative flex-1 min-h-0 arcade-grid-bg flex items-center justify-center overflow-hidden">
         {/* Live Webcam Video Element */}
         <video
           id="webcam-video"
@@ -341,7 +308,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
             videoActive && !capturedPreview ? 'block' : 'hidden'
           } w-full h-full object-cover transition-transform duration-150`}
           style={{
-            transform: `${facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)'} scale(${zoom})`
+            transform: facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)'
           }}
         />
 
@@ -360,10 +327,13 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 disabled={isInitializingCamera}
                 className="flex flex-col items-center justify-center gap-5 p-6 cursor-pointer group"
               >
-                <h1 className="pixel-font text-2xl sm:text-4xl md:text-5xl text-[#ffcc00] drop-shadow-[4px_4px_0_#8B1E41] group-hover:scale-105 transition-transform">
+                <span className="pixel-font text-[9px] sm:text-[10px] text-sky-300 bg-[#151928]/90 border border-[#334155] px-3 py-1.5 tracking-wider">
+                  🍄 DEFAULT LENS: {curModeObj.name.toUpperCase()}
+                </span>
+                <h1 className="pixel-font text-2xl sm:text-4xl md:text-5xl text-[#facc15] drop-shadow-[4px_4px_0_#9f1239] group-hover:scale-105 transition-transform">
                   PIXEL BOOF
                 </h1>
-                <span className="pixel-btn text-xs sm:text-sm px-7 py-3.5 min-h-[48px] bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00]">
+                <span className="pixel-btn text-xs sm:text-sm px-8 py-4 min-h-[50px] bg-gradient-to-b from-[#be123c] to-[#881337] text-[#facc15] border-[#facc15]">
                   {isInitializingCamera ? 'LOADING CAMERA...' : '▶ PRESS START'}
                 </span>
               </button>
@@ -372,25 +342,25 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
             {/* Stylish Retro Pixel-Font Privacy Box (Strictly on the Homepage) */}
             <div
               id="homepage-privacy-note"
-              className="w-full max-w-xl pixel-box bg-[#120d18]/95 border-[#ffcc00] px-3.5 py-2.5 sm:px-5 sm:py-3 text-center"
+              className="w-full max-w-xl pixel-box bg-[#131826]/95 border-[#334155] px-3.5 py-2.5 sm:px-5 sm:py-3 text-center"
             >
-              <p className="pixel-font text-[8px] sm:text-[9px] leading-relaxed text-[#ffcc00]">
+              <p className="pixel-font text-[8px] sm:text-[9px] leading-relaxed text-amber-300">
                 Note: No images are saved; data is erased immediately upon page refresh.
               </p>
             </div>
           </div>
         )}
 
-        {/* OPTIONAL MANUAL PREVIEW STAGE (Only shown if user toggles off Instant Transform in Lens Drawer) */}
+        {/* OPTIONAL MANUAL PREVIEW STAGE */}
         {capturedPreview && (
-          <div className="w-full h-full bg-[#110b1a]/95 p-3 sm:p-5 flex flex-col items-center justify-center z-15 animate-[fadeIn_0.2s_ease-out] overflow-hidden">
+          <div className="w-full h-full bg-[#0b0e17]/95 p-3 sm:p-5 flex flex-col items-center justify-center z-15 animate-[fadeIn_0.2s_ease-out] overflow-hidden">
             <div className="grid grid-cols-2 gap-3 sm:gap-6 items-center justify-center w-full max-w-2xl flex-1 min-h-0 max-h-[62dvh]">
               {/* Raw Captured Frame */}
               <div className="flex flex-col items-center h-full justify-center">
                 <span className="pixel-font text-[8px] text-slate-300 mb-1.5">
                   1. ORIGINAL PHOTO
                 </span>
-                <div className="w-full aspect-square max-h-[48dvh] pixel-box bg-[#120d18] border-white overflow-hidden">
+                <div className="w-full aspect-square max-h-[48dvh] pixel-box bg-[#0b0e17] border-[#475569] overflow-hidden">
                   <img
                     src={capturedPreview.rawDataUrl}
                     alt="Captured camera preview"
@@ -401,15 +371,16 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
               {/* Live Pixel Sticker Preview */}
               <div className="flex flex-col items-center h-full justify-center">
-                <span className="pixel-font text-[8px] text-[#ffcc00] mb-1.5 truncate max-w-full">
+                <span className="pixel-font text-[8px] text-[#facc15] mb-1.5 truncate max-w-full">
                   2. {curModeObj.name.toUpperCase()} PREVIEW
                 </span>
                 <div
-                  className="w-full aspect-square max-h-[48dvh] pixel-box bg-[#120d18] border-[#ffcc00] overflow-hidden relative flex items-center justify-center p-2"
+                  className="w-full aspect-square max-h-[48dvh] pixel-box bg-[#0b0e17] border-[#facc15] overflow-hidden relative flex items-center justify-center p-2"
                   style={{
                     backgroundImage:
-                      'radial-gradient(#2d1f3d 1px, transparent 1px)',
-                    backgroundSize: '10px 10px'
+                      'linear-gradient(45deg, #131826 25%, transparent 25%), linear-gradient(-45deg, #131826 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #131826 75%), linear-gradient(-45deg, transparent 75%, #131826 75%)',
+                    backgroundSize: '18px 18px',
+                    backgroundPosition: '0 0, 0 9px, 9px -9px, -9px 0'
                   }}
                 >
                   {pixelPreviewUrl ? (
@@ -422,7 +393,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                     <PixelLoader size="lg" />
                   )}
                   {isGeneratingPreview && (
-                    <div className="absolute inset-0 bg-[#120d18]/75 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-[#0b0e17]/75 flex items-center justify-center">
                       <PixelLoader size="lg" />
                     </div>
                   )}
@@ -434,14 +405,14 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
               <button
                 type="button"
                 onClick={handleConfirmTransform}
-                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-[#ffcc00] flex-1 justify-center"
+                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center"
               >
                 ✨ CREATE STICKER ({curModeObj.emoji} {curModeObj.name})
               </button>
               <button
                 type="button"
                 onClick={handleRetake}
-                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-[#23192d] text-rose-300 border-rose-400"
+                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-[#1e2538] text-rose-300 border-rose-400"
               >
                 🔄 RETAKE
               </button>
@@ -453,7 +424,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
         {isDuoMode && videoActive && !capturedPreview && (
           <div
             id="ship-banner"
-            className="absolute top-2.5 left-1/2 -translate-x-1/2 bg-black/85 border-2 border-[#ffcc00] text-[#ffcc00] pixel-font text-[8px] px-2.5 py-1 z-10 whitespace-nowrap"
+            className="absolute top-2.5 left-1/2 -translate-x-1/2 bg-[#0b0e17]/90 border-2 border-[#facc15] text-[#facc15] pixel-font text-[8px] px-2.5 py-1 z-10 whitespace-nowrap"
           >
             💑 DUO MODE: GET 2 PEOPLE IN FRAME!
           </div>
@@ -465,7 +436,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
             <button
               type="button"
               onClick={handleSwitchCamera}
-              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-black/80 text-white border-[#ffcc00]"
+              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#0b0e17]/85 text-white border-[#475569] hover:border-[#facc15]"
               title="Flip Front/Rear Camera"
             >
               🔄 Flip
@@ -473,15 +444,13 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-black/80 text-cyan-300 border-cyan-400"
+              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#0b0e17]/85 text-sky-300 border-sky-400/80"
               title="Upload Photo from Device"
             >
               📁 Upload
             </button>
           </div>
         )}
-
-        {videoActive && !capturedPreview && <ZoomControls />}
 
         {/* Camera Shutter Flash Overlay */}
         {didJustSnap && (
@@ -492,9 +461,9 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
         )}
       </div>
 
-      {/* SINGLE-ROW COMPACT BOTTOM CAMERA DOCK (Maximizes camera & image space!) */}
+      {/* SINGLE-ROW COMPACT BOTTOM CAMERA DOCK */}
       {(videoActive || capturedPreview) && (
-        <div className="bg-[#161020] border-t-2 border-[#ffcc00] px-2.5 sm:px-4 py-2 shrink-0">
+        <div className="bg-[#131826] border-t-2 border-[#334155] px-2.5 sm:px-4 py-2 shrink-0">
           <div className="grid grid-cols-3 items-center gap-2 max-w-4xl mx-auto">
             {/* Left Slot: Active Lens Button -> Opens Pop-Up Lens Drawer */}
             <div className="flex items-center justify-start min-w-0">
@@ -502,12 +471,12 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 id="btn-open-lens-drawer"
                 type="button"
                 onClick={() => setShowLensDrawer(true)}
-                className="pixel-btn text-[8px] sm:text-[9px] px-2.5 sm:px-3 py-2 min-h-[46px] bg-[#8B1E41] text-[#ffcc00] border-[#ffcc00] flex items-center gap-1.5 max-w-full truncate"
+                className="pixel-btn text-[8px] sm:text-[9px] px-2.5 sm:px-3 py-2 min-h-[46px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] flex items-center gap-1.5 max-w-full truncate"
                 title="Tap to change lens or enter a custom prompt"
               >
                 <span className="text-base shrink-0">{curModeObj.emoji}</span>
                 <div className="flex flex-col items-start min-w-0 text-left">
-                  <span className="text-[7px] text-amber-200/80 uppercase font-sans font-bold tracking-wider">
+                  <span className="text-[7px] text-amber-200/90 uppercase font-sans font-bold tracking-wider">
                     Lens ▲
                   </span>
                   <span className="truncate max-w-[85px] sm:max-w-[140px]">
@@ -523,7 +492,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 id="btn-shutter"
                 type="button"
                 onClick={takePhoto}
-                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#8B1E41] hover:bg-[#a6244d] border-3 border-[#ffcc00] shadow-[4px_4px_0_#000] flex items-center justify-center transition active:translate-x-0.5 active:translate-y-0.5 cursor-pointer shrink-0"
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-b from-[#be123c] to-[#881337] hover:from-[#e11d48] hover:to-[#9f1239] border-3 border-[#facc15] shadow-[4px_4px_0_#04060b] flex items-center justify-center transition active:translate-x-0.5 active:translate-y-0.5 cursor-pointer shrink-0"
                 title="Snap Photo & Generate Sticker!"
               >
                 <span className="icon text-white text-2xl sm:text-3xl">

@@ -11,18 +11,18 @@ export const THEMES = {
     desc: '8-bit sprites, platformers & speedsters',
     modes: [
       {
-        key: '8bit',
-        name: '8-bit',
-        emoji: '🎮',
-        color: '#06b6d4',
-        prompt: `Transform the person's face into an 8-bit pixel art character sprite. The final image should be a die-cut sticker of the sprite with a thick white border, isolated on a flat black background.`
-      },
-      {
         key: 'mario',
         name: 'Pipe Panic',
         emoji: '🍄',
         color: '#ef4444',
         prompt: `Transform the person in the photo into a new, original character that would fit into the Super Mario universe, in a cartoon sticker style. No overalls, plumber hats, or Mushrooms.`
+      },
+      {
+        key: '8bit',
+        name: '8-bit',
+        emoji: '🎮',
+        color: '#06b6d4',
+        prompt: `Transform the person's face into an 8-bit pixel art character sprite. The final image should be a die-cut sticker of the sprite with a thick white border, isolated on a flat black background.`
       },
       {
         key: 'sonic',
