@@ -6,7 +6,7 @@
 import {useStore, MAX_STICKERS, ORGANIZER_EMAIL} from '../../lib/store'
 import imageData from '../../lib/imageData'
 import modes from '../../lib/modes'
-import {MstcBadge, PixelCloseButton} from '../common/PixelUI'
+import {MstcBadge, PixelCloseButton, PixelIcon} from '../common/PixelUI'
 
 export default function StickerQueueModal({onClose}) {
   const photos = useStore.usePhotos()
@@ -33,6 +33,10 @@ export default function StickerQueueModal({onClose}) {
   const isBusy = stickerQueueDownloading || emailSending
   const readyPhotos = photos.filter(p => !p.isBusy)
   const hasBatchItems = stickerQueue.length > 0 || readyPhotos.length > 0
+  const hasName = Boolean((attendeeName || '').trim())
+  const hasSchool = Boolean((attendeeSchool || '').trim())
+  const hasAttendeeInfo = hasName && hasSchool
+  const canSubmitBatch = !isBusy && hasBatchItems && hasAttendeeInfo
 
   return (
     <div
@@ -44,9 +48,10 @@ export default function StickerQueueModal({onClose}) {
       aria-labelledby="sticker-queue-title"
     >
       <div
-        className="pixel-box bg-[#151928] border-[#facc15] max-w-2xl w-full p-3.5 sm:p-5 relative flex flex-col max-h-[92dvh] rounded-t-2xl sm:rounded-none"
+        className="pixel-box bg-[#151928] border-[#facc15] max-w-2xl w-full p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:p-5 relative flex flex-col max-h-[92dvh] rounded-t-2xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
+        <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-2 sm:hidden shrink-0" />
         {/* Header */}
         <div className="flex items-start justify-between border-b-2 border-[#334155] pb-3 mb-3 gap-2 shrink-0">
           <div>
@@ -54,16 +59,19 @@ export default function StickerQueueModal({onClose}) {
               <MstcBadge size="sm" />
               <h2
                 id="sticker-queue-title"
-                className="pixel-font text-xs sm:text-sm text-[#facc15]"
+                className="pixel-font text-xs sm:text-sm text-[#facc15] inline-flex items-center gap-1.5"
               >
-                🎟️ STICKER QUEUE (
-                <span id="modal-queue-count">{stickerQueue.length}</span>/
-                {MAX_STICKERS} MAX)
+                <PixelIcon name="ticket" size={14} />
+                <span>
+                  STICKER QUEUE (
+                  <span id="modal-queue-count">{stickerQueue.length}</span>/
+                  {MAX_STICKERS} MAX)
+                </span>
               </h2>
             </div>
             <p className="text-xs text-slate-300 mt-1">
-              Enter your Name &amp; High School! Auto-send your transparent Cricut-ready 3-sticker ZIP to{' '}
-              <strong className="text-[#facc15]">{ORGANIZER_EMAIL}</strong> or click{' '}
+              Enter your Name &amp; High School (required) to send your transparent Cricut-ready 3-sticker ZIP to{' '}
+              <strong className="text-[#facc15]">{ORGANIZER_EMAIL}</strong> or{' '}
               <strong>Download Batch</strong> on the Kiosk computer.
             </p>
           </div>
@@ -74,47 +82,84 @@ export default function StickerQueueModal({onClose}) {
           />
         </div>
 
-        {/* Attendee Name & School Tagging Inputs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-[#0b0e17] border-2 border-[#334155] p-3 mb-2.5 shrink-0">
-          <div>
-            <label
-              htmlFor="input-attendee-name"
-              className="pixel-font text-[8px] text-sky-300 block mb-1"
-            >
-              ATTENDEE FULL NAME
-            </label>
-            <input
-              id="input-attendee-name"
-              type="text"
-              value={attendeeName}
-              onChange={e => setAttendeeName(e.target.value)}
-              placeholder="e.g. Alex Rivera"
-              className="w-full bg-[#151928] border border-slate-600 focus:border-[#facc15] px-3 py-2 min-h-[40px] text-xs text-white outline-none"
-            />
+        {/* Attendee Name & School Tagging Inputs (Required) */}
+        <div className="bg-[#0b0e17] border-2 border-[#334155] p-3 mb-2.5 shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div>
+              <label
+                htmlFor="input-attendee-name"
+                className="pixel-font text-[8px] text-sky-300 flex items-center justify-between mb-1"
+              >
+                <span>ATTENDEE FULL NAME *</span>
+                <span
+                  className={
+                    hasName ? 'text-emerald-400' : 'text-amber-400'
+                  }
+                >
+                  {hasName ? 'READY' : 'REQUIRED'}
+                </span>
+              </label>
+              <input
+                id="input-attendee-name"
+                type="text"
+                required
+                aria-required="true"
+                value={attendeeName}
+                onChange={e => setAttendeeName(e.target.value)}
+                placeholder="e.g. Alex Rivera"
+                className={`w-full bg-[#151928] border px-3 py-2 min-h-[42px] text-base sm:text-xs text-white outline-none transition-colors ${
+                  hasName
+                    ? 'border-emerald-500/80 focus:border-[#facc15]'
+                    : 'border-amber-500/70 focus:border-[#facc15]'
+                }`}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="input-attendee-school"
+                className="pixel-font text-[8px] text-sky-300 flex items-center justify-between mb-1"
+              >
+                <span>HIGH SCHOOL *</span>
+                <span
+                  className={
+                    hasSchool ? 'text-emerald-400' : 'text-amber-400'
+                  }
+                >
+                  {hasSchool ? 'READY' : 'REQUIRED'}
+                </span>
+              </label>
+              <input
+                id="input-attendee-school"
+                type="text"
+                required
+                aria-required="true"
+                value={attendeeSchool}
+                onChange={e => setAttendeeSchool(e.target.value)}
+                placeholder="e.g. SPASH / Lincoln"
+                className={`w-full bg-[#151928] border px-3 py-2 min-h-[42px] text-base sm:text-xs text-white outline-none transition-colors ${
+                  hasSchool
+                    ? 'border-emerald-500/80 focus:border-[#facc15]'
+                    : 'border-amber-500/70 focus:border-[#facc15]'
+                }`}
+              />
+            </div>
           </div>
-          <div>
-            <label
-              htmlFor="input-attendee-school"
-              className="pixel-font text-[8px] text-sky-300 block mb-1"
-            >
-              HIGH SCHOOL
-            </label>
-            <input
-              id="input-attendee-school"
-              type="text"
-              value={attendeeSchool}
-              onChange={e => setAttendeeSchool(e.target.value)}
-              placeholder="e.g. SPASH / Lincoln"
-              className="w-full bg-[#151928] border border-slate-600 focus:border-[#facc15] px-3 py-2 min-h-[40px] text-xs text-white outline-none"
-            />
-          </div>
+          {!hasAttendeeInfo && (
+            <p className="pixel-font text-[7px] text-amber-300 mt-2 flex items-center gap-1.5">
+              <PixelIcon name="warning" size={11} className="text-amber-400 shrink-0" />
+              <span>
+                FILL IN BOTH FULL NAME &amp; HIGH SCHOOL ABOVE TO UNLOCK SEND
+              </span>
+            </p>
+          )}
         </div>
 
         {/* Confirmation Banner when Gmail Send Succeeds */}
         {lastEmailResult && (
-          <div className="bg-emerald-950/90 border border-emerald-400 px-3 py-2 mb-2.5 text-xs text-emerald-200 flex items-center justify-between gap-2 shrink-0">
+          <div className="bg-emerald-950/90 border border-emerald-400 px-3 py-2 mb-2.5 text-xs text-emerald-200 flex items-center gap-2 shrink-0">
+            <PixelIcon name="check" size={13} className="text-emerald-400" />
             <span>
-              ✅ Auto-sent <strong>{lastEmailResult.fileName}</strong> directly to{' '}
+              Auto-sent <strong>{lastEmailResult.fileName}</strong> directly to{' '}
               <strong>{lastEmailResult.recipientEmail}</strong>!
             </span>
           </div>
@@ -130,7 +175,7 @@ export default function StickerQueueModal({onClose}) {
                 const m =
                   modes[photo.mode] ||
                   modes['mario'] ||
-                  modes['8bit'] || {name: 'Custom', emoji: '✏️'}
+                  modes['8bit'] || {name: 'Custom', icon: 'pencil'}
                 const imgSrc = imageData.outputs[id] || imageData.inputs[id]
                 return (
                   <li
@@ -158,15 +203,17 @@ export default function StickerQueueModal({onClose}) {
                         />
                       </div>
                     )}
-                    <span className="pixel-font text-[8px] text-white mt-1 truncate max-w-full">
-                      {m.emoji} {m.name}
+                    <span className="pixel-font text-[8px] text-white mt-1 truncate max-w-full inline-flex items-center gap-1">
+                      <PixelIcon name={m.icon || 'star'} size={11} />
+                      <span>{m.name}</span>
                     </span>
                     <button
                       type="button"
                       onClick={() => removeFromStickerQueue(id)}
-                      className="pixel-btn text-[8px] px-2 py-1.5 min-h-[36px] bg-rose-800 hover:bg-rose-700 text-white border-rose-400 mt-2 w-full justify-center"
+                      className="pixel-btn text-[8px] px-2 py-1.5 min-h-[38px] bg-rose-800 hover:bg-rose-700 text-white border-rose-400 mt-2 w-full justify-center"
                     >
-                      Remove
+                      <PixelIcon name="trash" size={11} />
+                      <span>Remove</span>
                     </button>
                   </li>
                 )
@@ -187,7 +234,7 @@ export default function StickerQueueModal({onClose}) {
         {/* Footer Actions: Auto-Send via Gmail vs Kiosk Download Batch + Next Attendee Reset */}
         <div className="flex flex-col gap-2 pt-3 mt-2.5 border-t-2 border-[#334155] shrink-0">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {/* Auto-Send directly to mavscriptblue@gmail.com (Zero extra OS share popups!) */}
+            {/* Auto-Send directly to mavscriptblue@gmail.com */}
             <button
               id="btn-email-batch"
               type="button"
@@ -197,13 +244,22 @@ export default function StickerQueueModal({onClose}) {
                   autoEmail: true
                 })
               }
-              disabled={isBusy || !hasBatchItems}
+              disabled={!canSubmitBatch}
               className="pixel-btn text-[8px] sm:text-[9px] px-3 py-3 min-h-[44px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] justify-center"
-              title={`Automatically email ZIP batch directly to ${ORGANIZER_EMAIL}`}
+              title={
+                !hasAttendeeInfo
+                  ? 'Fill in your Full Name and High School first'
+                  : `Automatically email ZIP batch directly to ${ORGANIZER_EMAIL}`
+              }
             >
-              {emailSending && !stickerQueueDownloading
-                ? '⏳ SENDING TO GMAIL...'
-                : `📧 SEND TO GMAIL (${ORGANIZER_EMAIL.split('@')[0]})`}
+              <PixelIcon name="mail" size={13} />
+              <span>
+                {emailSending && !stickerQueueDownloading
+                  ? 'SENDING TO GMAIL...'
+                  : !hasAttendeeInfo
+                    ? 'ENTER NAME & SCHOOL TO SEND'
+                    : `SEND TO GMAIL (${ORGANIZER_EMAIL.split('@')[0]})`}
+              </span>
             </button>
 
             {/* School Computer Kiosks: Download Batch ZIP */}
@@ -216,13 +272,22 @@ export default function StickerQueueModal({onClose}) {
                   autoEmail: false
                 })
               }
-              disabled={isBusy || !hasBatchItems}
+              disabled={!canSubmitBatch}
               className="pixel-btn text-[8px] sm:text-[9px] px-3 py-3 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 justify-center"
-              title="Aggregate up to 3 captured/queued stickers into a ZIP file for local saving on this computer"
+              title={
+                !hasAttendeeInfo
+                  ? 'Fill in your Full Name and High School first'
+                  : 'Aggregate up to 3 captured/queued stickers into a ZIP file for local saving on this computer'
+              }
             >
-              {stickerQueueDownloading
-                ? '⏳ ZIPPING BATCH...'
-                : '⬇️ DOWNLOAD BATCH'}
+              <PixelIcon name="download" size={13} />
+              <span>
+                {stickerQueueDownloading
+                  ? 'ZIPPING BATCH...'
+                  : !hasAttendeeInfo
+                    ? 'ENTER NAME & SCHOOL FOR ZIP'
+                    : 'DOWNLOAD BATCH'}
+              </span>
             </button>
           </div>
 
@@ -231,18 +296,20 @@ export default function StickerQueueModal({onClose}) {
               id="btn-clear-queue"
               type="button"
               onClick={clearStickerQueue}
-              className="pixel-btn text-[8px] px-3 py-2 min-h-[38px] bg-[#1e2538] text-slate-200 border-[#475569]"
+              className="pixel-btn text-[8px] px-3 py-2 min-h-[40px] bg-[#1e2538] text-slate-200 border-[#475569]"
             >
-              🗑️ CLEAR QUEUE
+              <PixelIcon name="trash" size={12} />
+              <span>CLEAR QUEUE</span>
             </button>
 
             <button
               id="btn-reset-station-modal"
               type="button"
               onClick={handleResetAndClose}
-              className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2 min-h-[38px] bg-rose-800 hover:bg-rose-700 text-white border-rose-400 flex-1 sm:flex-initial justify-center"
+              className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2 min-h-[40px] bg-rose-800 hover:bg-rose-700 text-white border-rose-400 flex-1 sm:flex-initial justify-center"
             >
-              🔄 NEXT ATTENDEE (RETURN TO HOMEPAGE)
+              <PixelIcon name="reset" size={12} />
+              <span>NEXT ATTENDEE (RETURN TO HOMEPAGE)</span>
             </button>
           </div>
         </div>

@@ -365,7 +365,6 @@ export async function transformPhotoToPixelSticker(
   const modeObj = modes[modeKey] ||
     modes['mario'] || {
       name: 'Pipe Panic',
-      emoji: '🍄',
       color: '#ef4444'
     }
 
@@ -440,17 +439,11 @@ export async function transformPhotoToPixelSticker(
       ctx.drawImage(offCanvas, 0, 0, pixelSize, pixelSize, 52, 52, 408, 408)
     } catch {
       ctx.fillStyle = '#facc15'
-      ctx.font = 'bold 120px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(modeObj.emoji || '🍄', 256, 256)
+      ctx.fillRect(216, 216, 80, 80)
     }
   } else {
     ctx.fillStyle = '#facc15'
-    ctx.font = 'bold 120px sans-serif'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(modeObj.emoji || '🍄', 256, 256)
+    ctx.fillRect(216, 216, 80, 80)
   }
 
   ctx.restore()
@@ -465,17 +458,15 @@ export default limitFunction(
     inputFile,
     aspectRatio = '1:1',
     imageSize = '1K',
-    modeKey,
-    customPrompt,
     signal
   }) => {
-    try {
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), timeoutMs)
-      if (signal) {
-        signal.addEventListener('abort', () => controller.abort())
-      }
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), timeoutMs)
+    if (signal) {
+      signal.addEventListener('abort', () => controller.abort())
+    }
 
+    try {
       const response = await fetch('/api/generate-sticker', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -491,31 +482,28 @@ export default limitFunction(
 
       clearTimeout(timer)
 
-      if (response.ok) {
-        const data = await response.json()
-        if (data?.imageUrl) {
-          return await makeCricutReadyTransparentSticker(data.imageUrl)
-        }
+      const data = await response.json().catch(() => ({}))
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+            `Sticker generation failed (${response.status}). Check your server GEMINI_API_KEY configuration.`
+        )
       }
 
-      return await transformPhotoToPixelSticker(
-        inputFile,
-        modeKey,
-        customPrompt
-      )
+      if (!data?.imageUrl) {
+        throw new Error(
+          data?.error || 'Gemini did not return an image. Please try again.'
+        )
+      }
+
+      return await makeCricutReadyTransparentSticker(data.imageUrl)
     } catch (error) {
+      clearTimeout(timer)
       if (signal?.aborted) {
         return undefined
       }
-      console.warn(
-        'Using local canvas pixel sticker transformation fallback:',
-        error
-      )
-      return await transformPhotoToPixelSticker(
-        inputFile,
-        modeKey,
-        customPrompt
-      )
+      throw error
     }
   },
   {concurrency: 1}

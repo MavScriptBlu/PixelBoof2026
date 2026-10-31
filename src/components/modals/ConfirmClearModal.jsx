@@ -5,7 +5,7 @@
 
 import {useStore, MAX_STICKERS} from '../../lib/store'
 import imageData from '../../lib/imageData'
-import {MstcBadge, PixelCloseButton} from '../common/PixelUI'
+import {MstcBadge, PixelCloseButton, PixelIcon} from '../common/PixelUI'
 
 export default function ConfirmClearModal({
   onOpenStickerQueue,
@@ -45,7 +45,7 @@ export default function ConfirmClearModal({
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
-    showToast('⬇️ Downloaded sticker PNG!')
+    showToast('Downloaded sticker PNG!')
   }
 
   const handleConfirm = () => {
@@ -59,19 +59,19 @@ export default function ConfirmClearModal({
     } else if (type === 'retake_preview') {
       setCapturedPreview(null)
       closeConfirmModal()
-      showToast('📸 Photo discarded. Ready to retake!')
+      showToast('Photo discarded. Ready to retake!')
     } else {
       closeConfirmModal()
     }
   }
 
-  let title = '⚠️ HOLD UP! ARE YOU SURE?'
+  let title = 'HOLD UP! ARE YOU SURE?'
   let subtitle =
     'This action will permanently clear your images. Make sure you have saved your stickers before handing off to the next student!'
-  let confirmBtnLabel = '🗑️ YES, ERASE ALL & RESET'
+  let confirmBtnLabel = 'YES, ERASE ALL & RESET'
 
   if (type === 'reset_station') {
-    title = '⚠️ ERASE IMAGES & RESET FOR NEXT STUDENT?'
+    title = 'ERASE IMAGES & RESET FOR NEXT STUDENT?'
     subtitle =
       photoCount > 0
         ? `You have ${photoCount} snapped photo${
@@ -82,47 +82,49 @@ export default function ConfirmClearModal({
               : ''
           }. Continuing will PERMANENTLY ERASE all images and return to the Homepage for the next student!`
         : 'Are you sure you want to reset the booth and return to the Homepage for the next student?'
-    confirmBtnLabel = '🗑️ YES, ERASE ALL & RESET BOOTH'
+    confirmBtnLabel = 'YES, ERASE ALL & RESET BOOTH'
   } else if (type === 'delete_photo') {
-    title = '⚠️ DELETE THIS STICKER?'
+    title = 'DELETE THIS STICKER?'
     subtitle =
       'Are you sure you want to permanently delete this photo from your gallery? Download or save it first if you want to keep it!'
-    confirmBtnLabel = '🗑️ YES, DELETE THIS PHOTO'
+    confirmBtnLabel = 'YES, DELETE THIS PHOTO'
   } else if (type === 'clear_queue') {
-    title = '⚠️ CLEAR YOUR STICKER QUEUE?'
+    title = 'CLEAR YOUR STICKER QUEUE?'
     subtitle = `Are you sure you want to remove all ${queueCount} sticker${
       queueCount === 1 ? '' : 's'
     } from your 3-sticker queue?`
-    confirmBtnLabel = '🗑️ YES, CLEAR QUEUE'
+    confirmBtnLabel = 'YES, CLEAR QUEUE'
   } else if (type === 'retake_preview') {
-    title = '⚠️ DISCARD & RETAKE PHOTO?'
+    title = 'DISCARD & RETAKE PHOTO?'
     subtitle =
       'Are you sure you want to discard this snapped photo and take a new one?'
-    confirmBtnLabel = '🗑️ YES, DISCARD & RETAKE'
+    confirmBtnLabel = 'YES, DISCARD & RETAKE'
   }
 
   return (
     <div
       id="modal-confirm-clear"
-      className="fixed inset-0 bg-black/90 z-[60] flex items-center justify-center p-3 sm:p-4 no-print"
+      className="fixed inset-0 bg-black/90 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4 no-print"
       onClick={closeConfirmModal}
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="confirm-clear-title"
     >
       <div
-        className="pixel-box bg-[#151928] border-rose-400 max-w-lg w-full p-4 sm:p-5 relative flex flex-col gap-3.5 shadow-2xl"
+        className="pixel-box bg-[#151928] border-rose-400 max-w-lg w-full p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5 relative flex flex-col gap-3.5 shadow-2xl max-h-[92dvh] overflow-y-auto rounded-t-2xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
+        <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto -mb-1 sm:hidden shrink-0" />
         {/* Top Header with MSTC IT Badge + Warning */}
         <div className="flex items-start justify-between gap-2 border-b-2 border-[#334155] pb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <MstcBadge size="sm" />
             <h2
               id="confirm-clear-title"
-              className="pixel-font text-[10px] sm:text-xs text-[#facc15] leading-relaxed"
+              className="pixel-font text-[10px] sm:text-xs text-[#facc15] leading-relaxed inline-flex items-center gap-1.5"
             >
-              {title}
+              <PixelIcon name="warning" size={14} className="text-rose-400" />
+              <span>{title}</span>
             </h2>
           </div>
 
@@ -152,9 +154,10 @@ export default function ConfirmClearModal({
                 <button
                   type="button"
                   onClick={handleDownloadSingleBeforeDelete}
-                  className="pixel-btn text-[8px] px-2.5 py-1.5 bg-emerald-700 text-white border-emerald-300 self-start"
+                  className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-emerald-700 text-white border-emerald-300 self-start"
                 >
-                  ⬇️ SAVE PNG FIRST
+                  <PixelIcon name="download" size={12} />
+                  <span>SAVE PNG FIRST</span>
                 </button>
               </div>
             </div>
@@ -163,19 +166,23 @@ export default function ConfirmClearModal({
           {/* Save Options Before Resetting for Next Student */}
           {type === 'reset_station' && readyCount > 0 && (
             <div className="bg-[#151928] border border-[#facc15] p-3 space-y-2">
-              <p className="pixel-font text-[8px] text-[#facc15]">
-                💾 SAVE YOUR STICKERS BEFORE RESETTING:
+              <p className="pixel-font text-[8px] text-[#facc15] inline-flex items-center gap-1.5">
+                <PixelIcon name="download" size={11} />
+                <span>SAVE YOUR STICKERS BEFORE RESETTING:</span>
               </p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   disabled={stickerQueueDownloading}
                   onClick={downloadStickerQueue}
-                  className="pixel-btn text-[8px] px-3 py-2 min-h-[38px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center"
+                  className="pixel-btn text-[8px] px-3 py-2 min-h-[40px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center"
                 >
-                  {stickerQueueDownloading
-                    ? '⏳ ZIPPING...'
-                    : '⬇️ DOWNLOAD BATCH (ZIP)'}
+                  <PixelIcon name="download" size={12} />
+                  <span>
+                    {stickerQueueDownloading
+                      ? 'ZIPPING...'
+                      : 'DOWNLOAD BATCH (ZIP)'}
+                  </span>
                 </button>
 
                 {onOpenStickerQueue && (
@@ -185,9 +192,10 @@ export default function ConfirmClearModal({
                       closeConfirmModal()
                       onOpenStickerQueue()
                     }}
-                    className="pixel-btn text-[8px] px-3 py-2 min-h-[38px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] flex-1 justify-center"
+                    className="pixel-btn text-[8px] px-3 py-2 min-h-[40px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] flex-1 justify-center"
                   >
-                    🎟️ OPEN STICKER QUEUE (EMAIL / SAVE)
+                    <PixelIcon name="ticket" size={12} />
+                    <span>OPEN STICKER QUEUE (EMAIL / SAVE)</span>
                   </button>
                 )}
               </div>
@@ -203,9 +211,10 @@ export default function ConfirmClearModal({
               closeConfirmModal()
               setView('camera')
             }}
-            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[42px] bg-sky-500 hover:bg-sky-400 text-[#0b0e17] border-white w-full justify-center font-bold"
+            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] bg-sky-500 hover:bg-sky-400 text-[#0b0e17] border-white w-full justify-center font-bold"
           >
-            📷 JUST GO BACK TO CAMERA (KEEP ALL MY PHOTOS!)
+            <PixelIcon name="camera" size={13} />
+            <span>JUST GO BACK TO CAMERA (KEEP ALL MY PHOTOS!)</span>
           </button>
         )}
 
@@ -215,18 +224,19 @@ export default function ConfirmClearModal({
             id="btn-cancel-clear"
             type="button"
             onClick={closeConfirmModal}
-            className="pixel-btn text-[8px] sm:text-[9px] px-4 py-2.5 min-h-[42px] bg-[#1e2538] hover:bg-[#283149] text-white border-[#64748b] flex-1 justify-center"
+            className="pixel-btn text-[8px] sm:text-[9px] px-4 py-2.5 min-h-[44px] bg-[#1e2538] hover:bg-[#283149] text-white border-[#64748b] flex-1 justify-center"
           >
-            ✋ CANCEL (KEEP IMAGES)
+            <span>CANCEL (KEEP IMAGES)</span>
           </button>
 
           <button
             id="btn-confirm-clear"
             type="button"
             onClick={handleConfirm}
-            className="pixel-btn text-[8px] sm:text-[9px] px-4 py-2.5 min-h-[42px] bg-rose-700 hover:bg-rose-600 text-white border-rose-300 flex-1 justify-center"
+            className="pixel-btn text-[8px] sm:text-[9px] px-4 py-2.5 min-h-[44px] bg-rose-700 hover:bg-rose-600 text-white border-rose-300 flex-1 justify-center"
           >
-            {confirmBtnLabel}
+            <PixelIcon name="trash" size={12} />
+            <span>{confirmBtnLabel}</span>
           </button>
         </div>
       </div>

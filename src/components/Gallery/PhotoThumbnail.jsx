@@ -8,6 +8,7 @@ import imageData from '../../lib/imageData'
 import modes from '../../lib/modes'
 import PixelLoader from '../common/PixelLoader'
 import Share from '../common/Share'
+import {PixelIcon} from '../common/PixelUI'
 
 export default function PhotoThumbnail({photo, onClick}) {
   const stickerQueue = useStore.useStickerQueue()
@@ -16,7 +17,7 @@ export default function PhotoThumbnail({photo, onClick}) {
 
   const inQ = stickerQueue.includes(id)
   const m =
-    modes[mode] || modes['mario'] || modes['8bit'] || {name: 'Custom', emoji: '✏️'}
+    modes[mode] || modes['mario'] || modes['8bit'] || {name: 'Custom', icon: 'pencil'}
   const imgSrc = isBusy
     ? imageData.inputs[id]
     : imageData.outputs[id] || imageData.inputs[id]
@@ -35,7 +36,7 @@ export default function PhotoThumbnail({photo, onClick}) {
 
   return (
     <li
-      className={`pixel-box bg-[#151928] p-2 relative flex flex-col ${
+      className={`pixel-box bg-[#151928] p-1.5 sm:p-2 relative flex flex-col ${
         inQ ? 'border-[#facc15]' : 'border-[#334155]'
       }`}
     >
@@ -65,15 +66,17 @@ export default function PhotoThumbnail({photo, onClick}) {
           </div>
         )}
         {inQ && !isBusy && (
-          <span className="absolute top-1.5 left-1.5 pixel-font text-[7px] bg-[#facc15] text-black px-1.5 py-0.5">
-            ★ QUEUED
+          <span className="absolute top-1.5 left-1.5 pixel-font text-[7px] bg-[#facc15] text-black px-1.5 py-0.5 inline-flex items-center gap-1 leading-none">
+            <PixelIcon name="star" size={9} />
+            <span>QUEUED</span>
           </span>
         )}
       </div>
 
       <div className="flex items-center justify-between gap-1 mt-1.5 px-0.5">
-        <span className="pixel-font text-[7px] text-slate-300 truncate">
-          {m.emoji} {m.name}
+        <span className="pixel-font text-[7px] text-slate-300 truncate inline-flex items-center gap-1">
+          <PixelIcon name={m.icon || 'star'} size={10} />
+          <span className="truncate">{m.name}</span>
         </span>
       </div>
 
@@ -82,7 +85,7 @@ export default function PhotoThumbnail({photo, onClick}) {
           type="button"
           disabled={isBusy}
           onClick={handleToggleQueue}
-          className={`pixel-btn text-[7px] sm:text-[8px] px-2 py-1.5 min-h-[34px] flex-1 justify-center truncate ${
+          className={`pixel-btn text-[7px] sm:text-[8px] px-1.5 sm:px-2 py-1.5 min-h-[38px] flex-1 justify-center truncate ${
             inQ
               ? 'bg-emerald-700 text-white border-emerald-300'
               : 'bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]'
@@ -91,9 +94,15 @@ export default function PhotoThumbnail({photo, onClick}) {
           {isBusy ? (
             <PixelLoader size="md" />
           ) : inQ ? (
-            '✅ QUEUED'
+            <>
+              <PixelIcon name="check" size={11} />
+              <span>QUEUED</span>
+            </>
           ) : (
-            '🏷️ QUEUE'
+            <>
+              <PixelIcon name="ticket" size={11} />
+              <span>QUEUE</span>
+            </>
           )}
         </button>
 
@@ -109,10 +118,11 @@ export default function PhotoThumbnail({photo, onClick}) {
         <button
           type="button"
           onClick={handleDelete}
-          className="pixel-btn text-[9px] px-2 py-1.5 min-h-[34px] bg-[#0f1320] text-rose-400 border-rose-400/60"
+          aria-label="Delete photo"
+          className="pixel-btn text-[9px] px-2 py-1.5 min-h-[38px] min-w-[38px] justify-center bg-[#0f1320] text-rose-400 border-rose-400/60"
           title="Delete photo"
         >
-          🗑️
+          <PixelIcon name="trash" size={12} />
         </button>
       </div>
     </li>

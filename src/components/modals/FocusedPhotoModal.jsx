@@ -9,7 +9,7 @@ import imageData from '../../lib/imageData'
 import modes from '../../lib/modes'
 import Share from '../common/Share'
 import PixelLoader from '../common/PixelLoader'
-import {PixelCloseButton} from '../common/PixelUI'
+import {PixelCloseButton, PixelIcon} from '../common/PixelUI'
 
 export default function FocusedPhotoModal({
   photoId,
@@ -28,7 +28,7 @@ export default function FocusedPhotoModal({
   const m =
     (photo && modes[photo.mode]) ||
     modes['mario'] ||
-    modes['8bit'] || {name: 'Custom', emoji: '✏️'}
+    modes['8bit'] || {name: 'Custom', icon: 'pencil'}
   const outputSrc = imageData.outputs[photoId]
   const inputSrc = imageData.inputs[photoId]
   const imgSrc = showOriginal ? inputSrc || outputSrc : outputSrc || inputSrc
@@ -44,7 +44,7 @@ export default function FocusedPhotoModal({
     a.href = targetSrc
     a.download = `pixelboof-${photoId}.png`
     a.click()
-    showToast('⬇️ Downloaded transparent Cricut-ready sticker PNG!')
+    showToast('Downloaded transparent Cricut-ready sticker PNG!')
   }
 
   const handleEditSubmit = async e => {
@@ -56,14 +56,17 @@ export default function FocusedPhotoModal({
     setIsEditing(false)
   }
 
-  let queueBtnText = `🏷️ SAVE FOR STICKER (${qLen}/${MAX_STICKERS})`
+  let queueBtnIcon = 'ticket'
+  let queueBtnText = `SAVE FOR STICKER (${qLen}/${MAX_STICKERS})`
   let queueBtnClass =
     'bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]'
   if (inQ) {
-    queueBtnText = `✅ IN STICKER QUEUE (${qLen}/${MAX_STICKERS})`
+    queueBtnIcon = 'check'
+    queueBtnText = `IN STICKER QUEUE (${qLen}/${MAX_STICKERS})`
     queueBtnClass = 'bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300'
   } else if (qLen >= MAX_STICKERS) {
-    queueBtnText = `🚫 MAX ${MAX_STICKERS} STICKERS QUEUED`
+    queueBtnIcon = 'warning'
+    queueBtnText = `MAX ${MAX_STICKERS} STICKERS QUEUED`
     queueBtnClass = 'bg-rose-900 text-rose-200 border-rose-400'
   }
 
@@ -74,17 +77,20 @@ export default function FocusedPhotoModal({
       onClick={onClose}
     >
       <div
-        className="pixel-box bg-[#151928] border-[#facc15] max-w-xl w-full p-3.5 sm:p-5 relative flex flex-col items-center max-h-[94dvh] overflow-y-auto rounded-t-2xl sm:rounded-none"
+        className="pixel-box bg-[#151928] border-[#facc15] max-w-xl w-full p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:p-5 relative flex flex-col items-center max-h-[94dvh] overflow-y-auto rounded-t-2xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
+        <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-2 sm:hidden shrink-0" />
         {/* Compact Modal Header */}
         <div className="w-full flex items-center justify-between gap-2 pb-2.5 mb-3 border-b-2 border-[#334155] shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="pixel-font text-[9px] sm:text-xs text-[#facc15] truncate">
-              {m.emoji} {m.name}
+            <span className="pixel-font text-[9px] sm:text-xs text-[#facc15] truncate inline-flex items-center gap-1.5">
+              <PixelIcon name={m.icon || 'star'} size={13} />
+              <span>{m.name}</span>
             </span>
-            <span className="hidden sm:inline-block text-[10px] font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5">
-              ✓ Transparent PNG · Cricut Ready
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-300 bg-emerald-950/80 border border-emerald-500/40 px-2 py-0.5">
+              <PixelIcon name="check" size={10} />
+              <span>Transparent PNG · Cricut Ready</span>
             </span>
           </div>
 
@@ -93,9 +99,10 @@ export default function FocusedPhotoModal({
               <button
                 type="button"
                 onClick={() => setShowOriginal(!showOriginal)}
-                className="pixel-btn text-[8px] px-2.5 py-1.5 min-h-[36px] bg-[#0f1320] text-sky-300 border-sky-400/80"
+                className="pixel-btn text-[8px] px-2.5 py-1.5 min-h-[38px] bg-[#0f1320] text-sky-300 border-sky-400/80"
               >
-                {showOriginal ? '✨ Show Sticker' : '👁️ Compare Photo'}
+                <PixelIcon name={showOriginal ? 'sparkle' : 'eye'} size={12} />
+                <span>{showOriginal ? 'Show Sticker' : 'Compare Photo'}</span>
               </button>
             )}
             <PixelCloseButton
@@ -108,7 +115,7 @@ export default function FocusedPhotoModal({
 
         {/* LARGE HERO STICKER CANVAS (Transparent Studio Checkerboard + Zero Watermarks) */}
         <div
-          className="w-full max-w-[380px] sm:max-w-[440px] aspect-square max-h-[48dvh] sm:max-h-[54dvh] bg-[#0b0e17] border-2 border-[#475569] flex items-center justify-center p-3 sm:p-4 mb-3 relative overflow-hidden shrink-0"
+          className="w-full max-w-[380px] sm:max-w-[440px] aspect-square max-h-[38dvh] sm:max-h-[54dvh] bg-[#0b0e17] border-2 border-[#475569] flex items-center justify-center p-3 sm:p-4 mb-3 relative overflow-hidden shrink-0"
           style={{
             backgroundImage:
               'linear-gradient(45deg, #131826 25%, transparent 25%), linear-gradient(-45deg, #131826 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #131826 75%), linear-gradient(-45deg, transparent 75%, #131826 75%)',
@@ -138,9 +145,10 @@ export default function FocusedPhotoModal({
         <form onSubmit={handleEditSubmit} className="w-full mb-3 shrink-0">
           <label
             htmlFor="focused-edit-input"
-            className="pixel-font text-[7px] text-sky-300 block mb-1.5"
+            className="pixel-font text-[7px] text-sky-300 inline-flex items-center gap-1.5 mb-1.5"
           >
-            🪄 EDIT THIS STICKER:
+            <PixelIcon name="sparkle" size={10} />
+            <span>EDIT THIS STICKER:</span>
           </label>
           <div className="flex gap-1.5">
             <input
@@ -150,14 +158,21 @@ export default function FocusedPhotoModal({
               onChange={e => setEditPrompt(e.target.value)}
               disabled={isBusy}
               placeholder="e.g. Add pixel sunglasses or a wizard hat..."
-              className="flex-1 bg-[#0b0e17] border-2 border-[#334155] focus:border-[#facc15] px-3 py-2 min-h-[42px] text-xs text-white outline-none"
+              className="flex-1 bg-[#0b0e17] border-2 border-[#334155] focus:border-[#facc15] px-3 py-2 min-h-[42px] text-base sm:text-xs text-white outline-none"
             />
             <button
               type="submit"
               disabled={isBusy || !editPrompt.trim()}
               className="pixel-btn text-[8px] px-3.5 py-2 min-h-[42px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] shrink-0"
             >
-              {isBusy ? <PixelLoader size="md" /> : '🪄 EDIT'}
+              {isBusy ? (
+                <PixelLoader size="md" />
+              ) : (
+                <>
+                  <PixelIcon name="pencil" size={12} />
+                  <span>EDIT</span>
+                </>
+              )}
             </button>
           </div>
         </form>
@@ -169,9 +184,10 @@ export default function FocusedPhotoModal({
             type="button"
             disabled={isBusy}
             onClick={() => toggleStickerQueue(photoId)}
-            className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] flex-1 justify-center ${queueBtnClass}`}
+            className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] w-full sm:w-auto sm:flex-1 justify-center ${queueBtnClass}`}
           >
-            {queueBtnText}
+            <PixelIcon name={queueBtnIcon} size={13} />
+            <span>{queueBtnText}</span>
           </button>
 
           {qLen > 0 && onOpenStickerQueue && (
@@ -184,7 +200,10 @@ export default function FocusedPhotoModal({
               className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] bg-[#0f1320] text-sky-300 border-sky-400"
               title="Open Sticker Queue to Email or Download Batch"
             >
-              🎟️ QUEUE ({qLen}/{MAX_STICKERS})
+              <PixelIcon name="ticket" size={13} />
+              <span>
+                QUEUE ({qLen}/{MAX_STICKERS})
+              </span>
             </button>
           )}
 
@@ -201,7 +220,8 @@ export default function FocusedPhotoModal({
             onClick={downloadImage}
             className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] bg-[#1e2538] hover:bg-[#283149] text-white border-[#64748b]"
           >
-            ⬇️ PNG
+            <PixelIcon name="download" size={12} />
+            <span>PNG</span>
           </button>
         </div>
       </div>

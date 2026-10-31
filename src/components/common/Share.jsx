@@ -5,6 +5,7 @@
 
 import {useState, useEffect} from 'react'
 import {useStore} from '../../lib/store'
+import {PixelIcon} from './PixelUI'
 
 /**
  * Social Media Sharing component next to the sticker display.
@@ -39,7 +40,7 @@ export default function Share({
     }
   }, [])
 
-  const shareText = `Check out my custom ${modeName} pixel sticker made with #PixelBoof at Mid-State Tech-Con! 🕹️✨ #MSTC #PixelArt`
+  const shareText = `Check out my custom ${modeName} pixel sticker made with #PixelBoof at Mid-State Tech-Con! #MSTC #PixelArt`
   const twitterIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     shareText
   )}`
@@ -78,7 +79,6 @@ export default function Share({
     return 'downloaded'
   }
 
-  // Share to Twitter / X: copies sticker image to clipboard (or triggers native file share on mobile) so it's ready to attach/paste into the tweet
   const handleTwitterShare = async () => {
     if (!url) return
     try {
@@ -99,14 +99,13 @@ export default function Share({
     const status = await copyStickerToClipboardAndDownload()
     if (status === 'copied') {
       showToast(
-        '🐦 Sticker copied to clipboard! Press Ctrl+V / Paste in your Tweet!'
+        'Sticker copied to clipboard! Press Ctrl+V / Paste in your Tweet!'
       )
     } else {
-      showToast('🐦 Sticker PNG downloaded! Attach it to your Tweet!')
+      showToast('Sticker PNG downloaded! Attach it to your Tweet!')
     }
   }
 
-  // Share to Instagram: triggers native mobile share sheet (Instagram Stories/Feed) or saves & copies PNG before opening Instagram
   const handleInstagramShare = async e => {
     if (!url) return
     if (canNativeShare) {
@@ -125,7 +124,6 @@ export default function Share({
       }
     }
 
-    // Also download the PNG so desktop/mobile web users can select it in Instagram upload
     const a = document.createElement('a')
     a.href = url
     a.download = fileName
@@ -133,15 +131,15 @@ export default function Share({
     a.click()
     document.body.removeChild(a)
     await copyStickerToClipboardAndDownload()
-    showToast('📸 Sticker saved to device! Upload it directly on Instagram!')
+    showToast('Sticker saved to device! Upload it directly on Instagram!')
   }
 
   const handleCopyOnly = async () => {
     const status = await copyStickerToClipboardAndDownload()
     if (status === 'copied') {
-      showToast('📋 Sticker image copied to clipboard!')
+      showToast('Sticker image copied to clipboard!')
     } else {
-      showToast('⬇️ Sticker PNG saved to device!')
+      showToast('Sticker PNG saved to device!')
     }
     setShowSocialMenu(false)
   }
@@ -157,16 +155,17 @@ export default function Share({
             e.stopPropagation()
             setShowSocialMenu(prev => !prev)
           }}
-          className="pixel-btn text-[8px] px-2 py-1.5 min-h-[34px] bg-[#23192d] text-cyan-300 border-cyan-400/80"
+          className="pixel-btn text-[8px] px-2 py-1.5 min-h-[38px] bg-[#23192d] text-cyan-300 border-cyan-400/80"
           title="Share to Twitter or Instagram"
         >
-          📲 Share
+          <PixelIcon name="share" size={12} />
+          <span className="hidden sm:inline">Share</span>
         </button>
 
         {showSocialMenu && (
           <div
             onClick={e => e.stopPropagation()}
-            className="absolute bottom-full right-0 mb-1.5 w-44 pixel-box bg-[#120d18] border-[#ffcc00] p-2 z-30 flex flex-col gap-1.5"
+            className="absolute bottom-full right-0 mb-1.5 w-40 sm:w-44 pixel-box bg-[#120d18] border-[#ffcc00] p-2 z-30 flex flex-col gap-1.5"
           >
             <a
               href={twitterIntentUrl}
@@ -176,10 +175,10 @@ export default function Share({
                 handleTwitterShare()
                 setShowSocialMenu(false)
               }}
-              className="pixel-btn text-[8px] px-2.5 py-2 bg-[#1d9bf0] text-white border-white w-full justify-start no-underline"
+              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#1d9bf0] text-white border-white w-full justify-start no-underline"
             >
-              <span>𝕏</span>
-              <span>Share to Twitter</span>
+              <PixelIcon name="share" size={11} />
+              <span>Share to X</span>
             </a>
             <a
               href="https://www.instagram.com/"
@@ -189,17 +188,17 @@ export default function Share({
                 handleInstagramShare(e)
                 setShowSocialMenu(false)
               }}
-              className="pixel-btn text-[8px] px-2.5 py-2 bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white border-white w-full justify-start no-underline"
+              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white border-white w-full justify-start no-underline"
             >
-              <span>📸</span>
+              <PixelIcon name="camera" size={11} />
               <span>Instagram</span>
             </a>
             <button
               type="button"
               onClick={handleCopyOnly}
-              className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#23192d] text-slate-200 w-full justify-start"
+              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#23192d] text-slate-200 w-full justify-start"
             >
-              <span>📋</span>
+              <PixelIcon name="copy" size={11} />
               <span>Copy Image</span>
             </button>
           </div>
@@ -220,7 +219,7 @@ export default function Share({
         className="pixel-btn text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white border-white flex items-center gap-1.5 no-underline"
         title="Copy/Share sticker and post to Twitter / X"
       >
-        <span className="font-sans font-black text-xs leading-none">𝕏</span>
+        <PixelIcon name="share" size={12} />
         <span>TWITTER</span>
       </a>
 
@@ -234,7 +233,7 @@ export default function Share({
         className="pixel-btn text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white border-white flex items-center gap-1.5 no-underline"
         title="Share sticker to Instagram Stories or Feed"
       >
-        <span>📸</span>
+        <PixelIcon name="camera" size={12} />
         <span>INSTAGRAM</span>
       </a>
     </div>

@@ -5,7 +5,7 @@
 
 import {useStore} from '../../lib/store'
 import {THEMES} from '../../lib/modes'
-import {PixelCloseButton} from '../common/PixelUI'
+import {PixelCloseButton, PixelIcon} from '../common/PixelUI'
 
 export default function ModeSelector({
   customPrompt,
@@ -33,14 +33,16 @@ export default function ModeSelector({
       onClick={onClose}
     >
       <div
-        className="pixel-box bg-[#151928] border-[#facc15] max-w-2xl w-full p-3.5 sm:p-5 max-h-[88dvh] flex flex-col overflow-hidden rounded-t-2xl sm:rounded-none"
+        className="pixel-box bg-[#151928] border-[#facc15] max-w-2xl w-full p-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:p-5 max-h-[88dvh] flex flex-col overflow-hidden rounded-t-2xl sm:rounded-none"
         onClick={e => e.stopPropagation()}
       >
+        <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-2 sm:hidden shrink-0" />
         {/* Drawer Header */}
         <div className="flex items-center justify-between gap-3 pb-3 mb-3.5 border-b-2 border-[#334155] shrink-0">
           <div>
-            <h2 className="pixel-font text-[10px] sm:text-xs text-[#facc15]">
-              🎨 CHOOSE PIXEL LENS OR CUSTOM PROMPT
+            <h2 className="pixel-font text-[10px] sm:text-xs text-[#facc15] inline-flex items-center gap-2">
+              <PixelIcon name="arcade" size={14} />
+              <span>CHOOSE PIXEL LENS OR CUSTOM PROMPT</span>
             </h2>
             <p className="text-[11px] text-slate-300 mt-1">
               Tap a category deck below, then pick any character lens!
@@ -76,13 +78,13 @@ export default function ModeSelector({
                     role="tab"
                     aria-selected={isAct}
                     onClick={() => setTheme(key)}
-                    className={`pixel-btn text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[42px] flex items-center justify-start gap-2 ${
+                    className={`pixel-btn text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] flex items-center justify-start gap-2 ${
                       isAct
                         ? 'bg-[#9f1239] text-[#facc15] border-[#facc15]'
                         : 'bg-[#0f1320] text-slate-200 border-[#334155] hover:border-[#facc15]'
                     }`}
                   >
-                    <span className="text-base">{theme.emoji}</span>
+                    <PixelIcon name={theme.icon || 'star'} size={14} />
                     <span className="truncate">{theme.name}</span>
                   </button>
                 )
@@ -95,26 +97,26 @@ export default function ModeSelector({
                 id="btn-mode-random"
                 type="button"
                 onClick={() => handleSelectLens('random')}
-                className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[42px] flex items-center justify-center gap-1.5 ${
+                className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] flex items-center justify-center gap-2 ${
                   activeMode === 'random'
                     ? 'bg-[#facc15] text-[#0b0e17] border-white'
                     : 'bg-[#1e2538] text-slate-100 border-[#475569] hover:border-[#facc15]'
                 }`}
               >
-                <span>❓</span>
+                <PixelIcon name="question" size={13} />
                 <span>SURPRISE RANDOM LENS</span>
               </button>
               <button
                 id="btn-mode-custom"
                 type="button"
                 onClick={() => setMode('custom')}
-                className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[42px] flex items-center justify-center gap-1.5 ${
+                className={`pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[44px] flex items-center justify-center gap-2 ${
                   activeMode === 'custom'
                     ? 'bg-[#facc15] text-[#0b0e17] border-white'
                     : 'bg-[#1e2538] text-slate-100 border-[#475569] hover:border-[#facc15]'
                 }`}
               >
-                <span>✏️</span>
+                <PixelIcon name="pencil" size={13} />
                 <span>CUSTOM PROMPT</span>
               </button>
             </div>
@@ -127,8 +129,9 @@ export default function ModeSelector({
               className="bg-[#0b0e17] border-2 border-[#facc15] p-3 space-y-2.5"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="pixel-font text-[8px] text-[#facc15]">
-                  ✏️ WRITE YOUR CUSTOM STICKER PROMPT:
+                <span className="pixel-font text-[8px] text-[#facc15] inline-flex items-center gap-1.5">
+                  <PixelIcon name="pencil" size={11} />
+                  <span>WRITE YOUR CUSTOM STICKER PROMPT:</span>
                 </span>
                 {onOpenChatHelper && (
                   <button
@@ -137,9 +140,10 @@ export default function ModeSelector({
                       if (onClose) onClose()
                       onOpenChatHelper()
                     }}
-                    className="pixel-btn text-[8px] px-2.5 py-1.5 bg-[#1e2538] text-sky-300 border-sky-400"
+                    className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#1e2538] text-sky-300 border-sky-400"
                   >
-                    🤖 Ask PixelBot for Ideas
+                    <PixelIcon name="bot" size={12} />
+                    <span>Ask PixelBot for Ideas</span>
                   </button>
                 )}
               </div>
@@ -149,14 +153,15 @@ export default function ModeSelector({
                 value={customPrompt}
                 onChange={e => onCustomPromptChange(e.target.value)}
                 placeholder="e.g. Turn me into a 16-bit pixel art cyberpunk knight holding a neon laser sword..."
-                className="w-full bg-[#151928] border-2 border-[#334155] focus:border-[#facc15] text-white text-xs p-2.5 focus:outline-none resize-none"
+                className="w-full bg-[#151928] border-2 border-[#334155] focus:border-[#facc15] text-white text-base sm:text-xs p-2.5 focus:outline-none resize-none"
               />
               <button
                 type="button"
                 onClick={onClose}
-                className="pixel-btn w-full py-2.5 min-h-[42px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] text-[9px] justify-center"
+                className="pixel-btn w-full py-2.5 min-h-[44px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] text-[9px] justify-center"
               >
-                ✅ USE THIS CUSTOM PROMPT
+                <PixelIcon name="check" size={13} />
+                <span>USE THIS CUSTOM PROMPT</span>
               </button>
             </div>
           ) : (
@@ -178,13 +183,13 @@ export default function ModeSelector({
                         type="button"
                         onClick={() => handleSelectLens(m.key)}
                         aria-pressed={isSel}
-                        className={`pixel-btn w-full text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] flex items-center justify-start gap-1.5 ${
+                        className={`pixel-btn w-full text-[8px] sm:text-[9px] px-2.5 py-2.5 min-h-[44px] flex items-center justify-start gap-2 ${
                           isSel
                             ? 'bg-[#9f1239] text-[#facc15] border-[#facc15]'
                             : 'bg-[#1a2033] text-slate-100 border-[#334155] hover:border-[#94a3b8]'
                         }`}
                       >
-                        <span className="text-base shrink-0">{m.emoji}</span>
+                        <PixelIcon name={m.icon || 'star'} size={13} />
                         <span className="truncate">{m.name}</span>
                       </button>
                     </li>

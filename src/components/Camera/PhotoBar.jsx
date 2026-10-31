@@ -6,6 +6,7 @@
 import {useStore} from '../../lib/store'
 import imageData from '../../lib/imageData'
 import PixelLoader from '../common/PixelLoader'
+import {PixelIcon} from '../common/PixelUI'
 
 export default function PhotoBar({onPhotoClick}) {
   const photos = useStore.usePhotos()
@@ -22,9 +23,9 @@ export default function PhotoBar({onPhotoClick}) {
   return (
     <div
       id="photo-bar-container"
-      className="flex items-center justify-end max-w-full overflow-x-auto py-0.5"
+      className="flex items-center justify-end max-w-full overflow-x-auto no-scrollbar py-0.5"
     >
-      <ul id="photo-bar-list" className="flex items-center gap-1.5">
+      <ul id="photo-bar-list" className="flex items-center gap-1 sm:gap-1.5">
         {photos.map(({id, isBusy}) => {
           const inQ = stickerQueue.includes(id)
           const imgSrc = isBusy
@@ -66,8 +67,8 @@ export default function PhotoBar({onPhotoClick}) {
                   </div>
                 )}
                 {inQ && !isBusy && (
-                  <span className="absolute top-0 right-0 text-[8px] bg-[#facc15] text-black font-black px-0.5 leading-tight">
-                    ★
+                  <span className="absolute top-0 right-0 bg-[#facc15] text-black p-0.5 leading-none flex items-center justify-center">
+                    <PixelIcon name="star" size={8} />
                   </span>
                 )}
               </button>

@@ -12,6 +12,14 @@ import shuffle from 'lodash.shuffle'
 import modes, {THEMES} from './modes'
 import imageData from './imageData'
 import gen, {transformPhotoToPixelSticker} from './gemini'
+import {
+  playSuccessSound,
+  playSelectSound,
+  playQueueSound,
+  playClickSound,
+  isSoundEnabled,
+  setSoundEnabledStorage
+} from './sound'
 
 export const MAX_STICKERS = 3
 export const IMAGE_MODEL = 'gemini-nano-banana-2.1'
@@ -25,23 +33,23 @@ export const CHAT_PERSONAS = {
   coach: {
     id: 'coach',
     name: 'PixelBot Prompt Coach',
-    emoji: '🕹️',
+    icon: 'arcade',
     instruction:
-      'You are PixelBot, the official AI Arcade Coach & Tech-Con Booth Assistant for PixelBoof at Mid-State Technical College (MSTC). Help attendees craft vivid pixel-art and sticker prompts for gemini-nano-banana-2.1, suggest lens categories, and explain the 3-sticker Cricut Joy Xtra queue workflow. When suggesting a sticker prompt, wrap the exact prompt in double quotes so the user can click to generate it.'
+      'You are PixelBot, the official AI Arcade Coach & Tech-Con Booth Assistant for PixelBoof at Mid-State Technical College (MSTC). Help attendees craft vivid pixel-art and sticker prompts for gemini-nano-banana-2.1, suggest lens categories, and explain the 3-sticker Cricut Joy Xtra queue workflow. Users can attach a photo or pick one of their booth stickers directly in the chat bar below to ask for edit ideas or run a 1-click edit. When suggesting a sticker creation or edit prompt, always wrap the exact prompt in double quotes so the user can click to generate or edit it.'
   },
   artDirector: {
     id: 'artDirector',
     name: 'Retro Sprite Art Director',
-    emoji: '🎨',
+    icon: 'sparkle',
     instruction:
-      'You are a veteran 16-bit & 90s arcade pixel art director. Help users design original game characters, fursonas, holographic trading cards, and image-editing instructions for gemini-nano-banana-2.1. Focus on color palettes, silhouettes, lighting, and die-cut sticker composition. Wrap any suggested image generation or editing prompt in double quotes.'
+      'You are a veteran 16-bit & 90s arcade pixel art director. Help users design original game characters, fursonas, holographic trading cards, and image-editing instructions for gemini-nano-banana-2.1. Users can insert an image in the chat input bar below for you to inspect and edit. Focus on color palettes, silhouettes, lighting, and die-cut sticker composition. Wrap any suggested image generation or editing prompt in double quotes.'
   },
   techConGuide: {
     id: 'techConGuide',
     name: 'MSTC Tech-Con Helper',
-    emoji: '🎓',
+    icon: 'shield',
     instruction:
-      'You are the Mid-State Technical College (MSTC) IT & Software Development Booth Guide. Answer questions about how PixelBoof works with Gemini AI, how the Cricut Joy Xtra vinyl sticker queue works (strictly 3 stickers per student, submit 35 mins before bus departure), and encourage students interested in coding, AI, and IT careers.'
+      'You are the Mid-State Technical College (MSTC) IT & Software Development Booth Guide. Answer questions about how PixelBoof works with Gemini AI, how to attach a sticker or photo in the chat bar for AI edits, how the Cricut Joy Xtra vinyl sticker queue works (strictly 3 stickers per student, submit 35 mins before bus departure), and encourage students interested in coding, AI, and IT careers.'
   }
 }
 
@@ -52,6 +60,10 @@ const blobToBase64 = blob =>
     reader.onerror = reject
     reader.readAsDataURL(blob)
   })
+
+let activeToastTimer = null
+let activeErrorTimer = null
+let activeEmailBannerTimer = null
 
 const useStoreBase = create(
   immer((set, get) => ({
@@ -81,6 +93,7 @@ const useStoreBase = create(
     attendeeSchool: '',
     capturedPreview: null,
     instantTransform: true,
+    soundEnabled: isSoundEnabled(),
     errorMessage: null,
     toastInfo: null,
     confirmModal: null,
@@ -93,7 +106,7 @@ const useStoreBase = create(
       {
         id: 'welcome-1',
         role: 'model',
-        text: 'Welcome to **PixelBoof** at **Mid-State Tech-Con (Nov 13)**! I am **PixelBot**, running on ultra-fast, budget-friendly **Gemini Flash Lite**. Need a custom sticker prompt, an edit idea for a snapped photo, or help with the 3-sticker Cricut queue? Ask me anything!',
+        text: 'Welcome to **PixelBoof** at **Mid-State Tech-Con (Nov 13)**! I am **PixelBot**, running on ultra-fast, budget-friendly **Gemini Flash Lite**. You can attach a photo or pick one of your booth stickers using the buttons in the chat bar below to get custom edit prompts or run a **1-click sticker edit**!',
         modelUsed: 'gemini-3.1-flash-lite',
         timestamp: Date.now()
       }
@@ -125,10 +138,32 @@ const useStoreBase = create(
     },
 
     showToast: (message, type = 'info') => {
-      set({toastInfo: {message, type, id: Date.now()}})
+      if (activeToastTimer) {
+        clearTimeout(activeToastTimer)
+        activeToastTimer = null
+      }
+      if (!message) {
+        set({toastInfo: null})
+        return
+      }
+      const id = Date.now() + Math.random()
+      set({toastInfo: {message, type, id}})
+      const duration = type === 'error' ? 2800 : 2300
+      activeToastTimer = setTimeout(() => {
+        set(state => {
+          if (state.toastInfo?.id === id) {
+            state.toastInfo = null
+          }
+        })
+        activeToastTimer = null
+      }, duration)
     },
 
     clearToast: () => {
+      if (activeToastTimer) {
+        clearTimeout(activeToastTimer)
+        activeToastTimer = null
+      }
       set({toastInfo: null})
     },
 
@@ -156,10 +191,19 @@ const useStoreBase = create(
       set({imageSize: size})
     },
 
+    toggleSound: () => {
+      const next = !get().soundEnabled
+      setSoundEnabledStorage(next)
+      set({soundEnabled: next})
+      if (next) {
+        playClickSound()
+      }
+    },
+
     snapPhoto: async (b64, customPrompt) => {
       const {activeMode, activeTheme, isLockedSim, aspectRatio, imageSize} = get()
       if (isLockedSim) {
-        get().showToast('🔒 Booth is locked outside event hours! Unlock first.', 'error')
+        get().showToast('Booth is locked outside event hours! Unlock first.', 'error')
         return
       }
 
@@ -221,11 +265,14 @@ const useStoreBase = create(
             photo.isBusy = false
           }
         })
+        playSuccessSound()
         const modeName = modes[effectiveMode]?.name || 'Custom'
-        get().showToast(`✨ Generated ${modeName} sticker!`)
+        get().showToast(`Generated ${modeName} sticker!`)
       } catch (error) {
         console.error('Photo generation failed:', error)
-        get().setErrorMessage('Oh no! The pixels got crossed. Please try again.')
+        get().setErrorMessage(
+          error?.message || 'Oh no! The pixels got crossed. Please try again.'
+        )
         get().confirmDeletePhoto(id)
       }
     },
@@ -239,7 +286,7 @@ const useStoreBase = create(
     }) => {
       const {isLockedSim} = get()
       if (isLockedSim) {
-        get().showToast('🔒 Booth is locked outside event hours! Unlock first.', 'error')
+        get().showToast('Booth is locked outside event hours! Unlock first.', 'error')
         return null
       }
       if (!prompt?.trim()) {
@@ -288,15 +335,18 @@ const useStoreBase = create(
             photo.isBusy = false
           }
         })
+        playSuccessSound()
         get().showToast(
           sourceImage
-            ? '🪄 Edited sticker with gemini-nano-banana-2.1!'
-            : '🎨 Created new sticker with gemini-nano-banana-2.1!'
+            ? 'Edited sticker with gemini-nano-banana-2.1!'
+            : 'Created new sticker with gemini-nano-banana-2.1!'
         )
         return id
       } catch (error) {
         console.error('Create/Edit image failed:', error)
-        get().setErrorMessage('Could not generate or edit image. Please try again.')
+        get().setErrorMessage(
+          error?.message || 'Could not generate or edit image. Please try again.'
+        )
         get().confirmDeletePhoto(id)
         return null
       }
@@ -329,7 +379,8 @@ const useStoreBase = create(
 
         if (result) {
           imageData.outputs[photoId] = result
-          get().showToast('✨ Sticker updated with gemini-nano-banana-2.1!')
+          playSuccessSound()
+          get().showToast('Sticker updated with gemini-nano-banana-2.1!')
         }
         set(state => {
           const p = state.photos.find(item => item.id === photoId)
@@ -347,9 +398,13 @@ const useStoreBase = create(
       }
     },
 
-    sendChatMessage: async userText => {
-      const trimmed = userText?.trim()
-      if (!trimmed || get().chatLoading) return
+    sendChatMessage: async (userText, attachedImage = null) => {
+      const trimmed = (userText || '').trim()
+      if ((!trimmed && !attachedImage) || get().chatLoading) return
+
+      const effectiveText =
+        trimmed ||
+        'Analyze this attached image and suggest 3 creative pixel sticker edit prompts in double quotes!'
 
       const {chatModel, chatPersona, chatMessages} = get()
       const personaObj = CHAT_PERSONAS[chatPersona] || CHAT_PERSONAS.coach
@@ -357,7 +412,8 @@ const useStoreBase = create(
       const userMsg = {
         id: `user-${Date.now()}`,
         role: 'user',
-        text: trimmed,
+        text: effectiveText,
+        image: attachedImage || null,
         timestamp: Date.now()
       }
 
@@ -376,7 +432,8 @@ const useStoreBase = create(
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            message: trimmed,
+            message: effectiveText,
+            image: attachedImage || null,
             history: historyPayload,
             model: chatModel,
             systemInstruction: personaObj.instruction
@@ -387,13 +444,16 @@ const useStoreBase = create(
         const replyText =
           res.ok && data?.reply
             ? data.reply
-            : `Here's a fun sticker prompt idea you can try right now: "A retro 16-bit pixel art arcade hero wearing neon visors and a burgundy Mid-State jacket holding a glowing power-up crystal"`
+            : attachedImage
+              ? `Awesome image! Click any of these prompts to edit your attached image into a die-cut sticker:\n- "Add a glowing 16-bit wizard hat and arcane sparkles around the character"\n- "Transform into a retro 90s arcade boss sprite with neon cyber visors"`
+              : `Here's a fun sticker prompt idea you can try right now: "A retro 16-bit pixel art arcade hero wearing neon visors and a burgundy Mid-State jacket holding a glowing power-up crystal"`
 
         set(state => {
           state.chatMessages.push({
             id: `model-${Date.now()}`,
             role: 'model',
             text: replyText,
+            sourceImage: attachedImage || null,
             modelUsed: data?.modelUsed || chatModel,
             timestamp: Date.now()
           })
@@ -405,7 +465,10 @@ const useStoreBase = create(
           state.chatMessages.push({
             id: `model-${Date.now()}`,
             role: 'model',
-            text: `Here is a custom prompt suggestion for **gemini-nano-banana-2.1**: "Transform the character into a 16-bit synthwave pixel knight with holographic armor and a glowing shield"`,
+            text: attachedImage
+              ? `Here are custom edit prompts for your attached image:\n- "Add a 16-bit pixel wizard hat and glowing magical staff"\n- "Give the character holographic retro arcade sunglasses and neon armor"`
+              : `Here is a custom prompt suggestion for **gemini-nano-banana-2.1**: "Transform the character into a 16-bit synthwave pixel knight with holographic armor and a glowing shield"`,
+            sourceImage: attachedImage || null,
             modelUsed: chatModel,
             timestamp: Date.now()
           })
@@ -452,27 +515,42 @@ const useStoreBase = create(
     },
 
     setTheme: themeKey => {
+      playSelectSound()
       set(state => {
         state.activeTheme = themeKey
         state.lensesCollapsed = false
         const themeModes = THEMES[themeKey]?.modes || []
-        if (
-          state.activeMode !== 'custom' &&
-          state.activeMode !== 'random' &&
-          themeModes.length > 0
-        ) {
+        if (themeModes.length > 0) {
           state.activeMode = themeModes[0].key
         }
       })
     },
-    setMode: mode => set({activeMode: mode}),
+    setMode: mode => {
+      playSelectSound()
+      set({activeMode: mode})
+    },
     setLensesCollapsed: collapsed => set({lensesCollapsed: collapsed}),
     setView: view => set({currentView: view}),
     setActiveTopTab: tab => set({activeTopTab: tab}),
     setIsLockedSim: locked => set({isLockedSim: locked}),
     setShowThemeModal: show => set({showThemeModal: show}),
     setZoom: zoom => set({zoom}),
-    setErrorMessage: message => set({errorMessage: message}),
+    setErrorMessage: message => {
+      if (activeErrorTimer) {
+        clearTimeout(activeErrorTimer)
+        activeErrorTimer = null
+      }
+      if (!message) {
+        set({errorMessage: null})
+        return
+      }
+      set({errorMessage: message})
+      get().showToast(message, 'error')
+      activeErrorTimer = setTimeout(() => {
+        set({errorMessage: null})
+        activeErrorTimer = null
+      }, 2800)
+    },
     setAttendeeName: name => set({attendeeName: name}),
     setAttendeeSchool: school => set({attendeeSchool: school}),
 
@@ -482,7 +560,7 @@ const useStoreBase = create(
         return
       }
       if (stickerQueue.length >= MAX_STICKERS) {
-        const msg = `🚫 ${MAX_STICKERS}-Sticker Limit Reached (${MAX_STICKERS}/${MAX_STICKERS})! Remove one from your Sticker Queue if you want to swap.`
+        const msg = `${MAX_STICKERS}-Sticker Limit Reached (${MAX_STICKERS}/${MAX_STICKERS})! Remove one from your Sticker Queue if you want to swap.`
         get().setErrorMessage(msg)
         get().showToast(msg, 'error')
         return
@@ -490,7 +568,8 @@ const useStoreBase = create(
       set(state => {
         state.stickerQueue.push(id)
       })
-      get().showToast(`🎟️ Saved to Sticker Queue (${get().stickerQueue.length}/${MAX_STICKERS})!`)
+      playQueueSound()
+      get().showToast(`Saved to Sticker Queue (${get().stickerQueue.length}/${MAX_STICKERS})!`)
     },
 
     toggleStickerQueue: id => {
@@ -545,7 +624,7 @@ const useStoreBase = create(
         state.currentView = 'camera'
         state.cameraSessionKey += 1
       })
-      get().showToast('🔄 Booth reset! Returned to Homepage for next attendee.')
+      get().showToast('Booth reset! Returned to Homepage for next attendee.')
     },
 
     /*
@@ -574,8 +653,17 @@ const useStoreBase = create(
         return {ok: false}
       }
 
-      const rawName = (attendeeName || '').trim() || 'Attendee'
-      const rawSchool = (attendeeSchool || '').trim() || 'TechCon'
+      const rawName = (attendeeName || '').trim()
+      const rawSchool = (attendeeSchool || '').trim()
+
+      if (!rawName || !rawSchool) {
+        get().showToast(
+          'Please fill out both your Full Name and High School before sending!',
+          'error'
+        )
+        return {ok: false}
+      }
+
       const prefix = `${rawName.replace(/\s+/g, '_')}-${rawSchool.replace(/\s+/g, '_')}`
       const zipFileName = `${prefix}_PixelBoof_${targetIds.length}stickers.zip`
 
@@ -634,6 +722,9 @@ const useStoreBase = create(
             )
           }
 
+          if (activeEmailBannerTimer) {
+            clearTimeout(activeEmailBannerTimer)
+          }
           set({
             lastEmailResult: {
               ok: true,
@@ -644,19 +735,26 @@ const useStoreBase = create(
               timestamp: Date.now()
             }
           })
+          activeEmailBannerTimer = setTimeout(() => {
+            set({lastEmailResult: null})
+            activeEmailBannerTimer = null
+          }, 3000)
         }
 
         if (downloadLocal && autoEmail) {
+          playSuccessSound()
           get().showToast(
-            `✅ Downloaded "${zipFileName}" & emailed via Gmail to ${ORGANIZER_EMAIL}!`
+            `Downloaded "${zipFileName}" & emailed via Gmail to ${ORGANIZER_EMAIL}!`
           )
         } else if (autoEmail) {
+          playSuccessSound()
           get().showToast(
-            `📧 Emailed "${zipFileName}" (${targetIds.length} stickers) via Gmail to ${ORGANIZER_EMAIL}!`
+            `Emailed "${zipFileName}" (${targetIds.length} stickers) via Gmail to ${ORGANIZER_EMAIL}!`
           )
         } else if (downloadLocal) {
+          playSuccessSound()
           get().showToast(
-            `⬇️ Downloaded "${zipFileName}" (${targetIds.length} sticker${
+            `Downloaded "${zipFileName}" (${targetIds.length} sticker${
               targetIds.length === 1 ? '' : 's'
             })!`
           )

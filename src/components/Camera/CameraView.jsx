@@ -10,6 +10,8 @@ import {transformPhotoToPixelSticker} from '../../lib/gemini'
 import ModeSelector from './ModeSelector'
 import PhotoBar from './PhotoBar'
 import PixelLoader from '../common/PixelLoader'
+import {PixelIcon} from '../common/PixelUI'
+import {playShutterSound, playSuccessSound, playClickSound} from '../../lib/sound'
 
 const captureCanvas = document.createElement('canvas')
 const captureCtx = captureCanvas.getContext('2d')
@@ -151,6 +153,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
         if (!cancelled) {
           setPixelPreviewUrl(url)
           setIsGeneratingPreview(false)
+          playSuccessSound()
         }
       })
       .catch(() => {
@@ -175,6 +178,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
     reader.onload = ev => {
       const dataUrl = ev.target?.result
       if (typeof dataUrl === 'string') {
+        playShutterSound()
         setDidJustSnap(true)
         setTimeout(() => setDidJustSnap(false), 380)
         if (instantTransform) {
@@ -193,6 +197,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
   const takePhoto = () => {
     if (activeMode === 'custom' && !customPrompt.trim()) {
+      playClickSound()
       setShowLensDrawer(true)
       showToast('Enter a custom prompt in the Lens Drawer first!', 'error')
       return
@@ -200,6 +205,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
     const video = videoRef.current
     if (!video || !videoActive) {
+      playClickSound()
       showToast('Press Start to enable the camera or upload a photo first!', 'error')
       return
     }
@@ -245,6 +251,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
     const capturedDataUrl = captureCanvas.toDataURL('image/jpeg', 0.92)
 
+    playShutterSound()
     setDidJustSnap(true)
     setTimeout(() => setDidJustSnap(false), 380)
 
@@ -272,9 +279,9 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
   const curModeObj =
     activeMode === 'random'
-      ? {name: 'Random', emoji: '❓'}
+      ? {name: 'Random', icon: 'question'}
       : activeMode === 'custom'
-        ? {name: 'Custom', emoji: '✏️'}
+        ? {name: 'Custom', icon: 'pencil'}
         : modes[activeMode] || modes['mario'] || modes['8bit']
 
   const isDuoMode = ['shipcouple', 'fantasymates', 'moonlightpair'].includes(
@@ -325,13 +332,20 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 type="button"
                 onClick={() => startVideo(facingMode)}
                 disabled={isInitializingCamera}
-                className="flex flex-col items-center justify-center gap-5 p-6 cursor-pointer group"
+                className="flex flex-col items-center justify-center gap-6 p-6 cursor-pointer group"
               >
                 <h1 className="pixel-font text-2xl sm:text-4xl md:text-5xl text-[#facc15] drop-shadow-[4px_4px_0_#9f1239] group-hover:scale-105 transition-transform">
                   PIXEL BOOF
                 </h1>
-                <span className="pixel-btn text-xs sm:text-sm px-8 py-4 min-h-[50px] bg-gradient-to-b from-[#be123c] to-[#881337] text-[#facc15] border-[#facc15]">
-                  {isInitializingCamera ? 'LOADING CAMERA...' : '▶ PRESS START'}
+                <span className="pixel-btn text-xs sm:text-sm px-8 py-4 min-h-[52px] bg-gradient-to-b from-[#be123c] to-[#881337] text-[#facc15] border-[#facc15] inline-flex items-center justify-center gap-2.5 leading-none">
+                  {isInitializingCamera ? (
+                    <span className="leading-none">LOADING CAMERA...</span>
+                  ) : (
+                    <>
+                      <PixelIcon name="play" size={14} className="shrink-0 block" />
+                      <span className="leading-none">PRESS START</span>
+                    </>
+                  )}
                 </span>
               </button>
             </div>
@@ -398,20 +412,22 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
               </div>
             </div>
 
-            <div className="flex items-center justify-center gap-3 mt-3 w-full max-w-md shrink-0">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2 sm:gap-3 mt-2.5 sm:mt-3 w-full max-w-md shrink-0">
               <button
                 type="button"
                 onClick={handleConfirmTransform}
-                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center"
+                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center gap-2"
               >
-                ✨ CREATE STICKER ({curModeObj.emoji} {curModeObj.name})
+                <PixelIcon name="sparkle" size={13} />
+                <span>CREATE STICKER ({curModeObj.name})</span>
               </button>
               <button
                 type="button"
                 onClick={handleRetake}
-                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-[#1e2538] text-rose-300 border-rose-400"
+                className="pixel-btn text-[9px] px-4 py-3 min-h-[44px] bg-[#1e2538] text-rose-300 border-rose-400 justify-center gap-2"
               >
-                🔄 RETAKE
+                <PixelIcon name="reset" size={13} />
+                <span>RETAKE</span>
               </button>
             </div>
           </div>
@@ -421,9 +437,10 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
         {isDuoMode && videoActive && !capturedPreview && (
           <div
             id="ship-banner"
-            className="absolute top-2.5 left-1/2 -translate-x-1/2 bg-[#0b0e17]/90 border-2 border-[#facc15] text-[#facc15] pixel-font text-[8px] px-2.5 py-1 z-10 whitespace-nowrap"
+            className="absolute top-14 sm:top-2.5 left-1/2 -translate-x-1/2 bg-[#0b0e17]/90 border-2 border-[#facc15] text-[#facc15] pixel-font text-[8px] px-2.5 py-1.5 z-10 whitespace-nowrap max-w-[92%] truncate inline-flex items-center gap-2"
           >
-            💑 DUO MODE: GET 2 PEOPLE IN FRAME!
+            <PixelIcon name="heart" size={12} />
+            <span>DUO MODE: GET 2 PEOPLE IN FRAME!</span>
           </div>
         )}
 
@@ -433,18 +450,20 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
             <button
               type="button"
               onClick={handleSwitchCamera}
-              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#0b0e17]/85 text-white border-[#475569] hover:border-[#facc15]"
+              className="pixel-btn text-[8px] px-3 sm:px-2.5 py-2 min-h-[44px] sm:min-h-[40px] bg-[#0b0e17]/85 text-white border-[#475569] hover:border-[#facc15]"
               title="Flip Front/Rear Camera"
             >
-              🔄 Flip
+              <PixelIcon name="flip" size={12} />
+              <span>Flip</span>
             </button>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="pixel-btn text-[8px] px-2.5 py-2 min-h-[38px] bg-[#0b0e17]/85 text-sky-300 border-sky-400/80"
+              className="pixel-btn text-[8px] px-3 sm:px-2.5 py-2 min-h-[44px] sm:min-h-[40px] bg-[#0b0e17]/85 text-sky-300 border-sky-400/80"
               title="Upload Photo from Device"
             >
-              📁 Upload
+              <PixelIcon name="upload" size={12} />
+              <span>Upload</span>
             </button>
           </div>
         )}
@@ -460,23 +479,24 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
 
       {/* SINGLE-ROW COMPACT BOTTOM CAMERA DOCK */}
       {(videoActive || capturedPreview) && (
-        <div className="bg-[#131826] border-t-2 border-[#334155] px-2.5 sm:px-4 py-2 shrink-0">
-          <div className="grid grid-cols-3 items-center gap-2 max-w-4xl mx-auto">
+        <div className="bg-[#131826] border-t-2 border-[#334155] px-2 sm:px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] sm:py-2 shrink-0">
+          <div className="grid grid-cols-3 items-center gap-1.5 sm:gap-2 max-w-4xl mx-auto">
             {/* Left Slot: Active Lens Button -> Opens Pop-Up Lens Drawer */}
             <div className="flex items-center justify-start min-w-0">
               <button
                 id="btn-open-lens-drawer"
                 type="button"
                 onClick={() => setShowLensDrawer(true)}
-                className="pixel-btn text-[8px] sm:text-[9px] px-2.5 sm:px-3 py-2 min-h-[46px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] flex items-center gap-1.5 max-w-full truncate"
+                className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2 min-h-[46px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] flex items-center gap-2 max-w-full truncate"
                 title="Tap to change lens or enter a custom prompt"
               >
-                <span className="text-base shrink-0">{curModeObj.emoji}</span>
-                <div className="flex flex-col items-start min-w-0 text-left">
-                  <span className="text-[7px] text-amber-200/90 uppercase font-sans font-bold tracking-wider">
-                    Lens ▲
+                <PixelIcon name={curModeObj.icon || 'star'} size={15} />
+                <div className="flex flex-col items-start min-w-0 text-left gap-0.5">
+                  <span className="text-[7px] text-amber-200/90 uppercase font-sans font-bold tracking-wider inline-flex items-center gap-1 leading-none">
+                    <span>Lens</span>
+                    <PixelIcon name="chevron-up" size={8} />
                   </span>
-                  <span className="truncate max-w-[85px] sm:max-w-[140px]">
+                  <span className="truncate max-w-[74px] sm:max-w-[140px] leading-none">
                     {curModeObj.name}
                   </span>
                 </div>
@@ -492,9 +512,7 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                 className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-b from-[#be123c] to-[#881337] hover:from-[#e11d48] hover:to-[#9f1239] border-3 border-[#facc15] shadow-[4px_4px_0_#04060b] flex items-center justify-center transition active:translate-x-0.5 active:translate-y-0.5 cursor-pointer shrink-0"
                 title="Snap Photo & Generate Sticker!"
               >
-                <span className="icon text-white text-2xl sm:text-3xl">
-                  camera
-                </span>
+                <PixelIcon name="camera" size={24} className="text-white" />
               </button>
             </div>
 

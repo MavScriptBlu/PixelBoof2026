@@ -16,7 +16,8 @@ import ErrorToast from './modals/ErrorToast'
 import FocusedPhotoModal from './modals/FocusedPhotoModal'
 import StickerQueueModal from './modals/StickerQueueModal'
 import ConfirmClearModal from './modals/ConfirmClearModal'
-import {PixelCloseButton} from './common/PixelUI'
+import {PixelCloseButton, PixelIcon} from './common/PixelUI'
+import {playClickSound} from '../lib/sound'
 import './App.css'
 
 export default function App() {
@@ -98,6 +99,24 @@ export default function App() {
     }
   }, [photos.length, stickerQueue.length])
 
+  // Global delegated retro 8-bit click sound for interactive buttons
+  useEffect(() => {
+    const handleGlobalButtonClick = e => {
+      const target = e.target?.closest?.(
+        'button, a.pixel-btn, [role="button"], [role="tab"]'
+      )
+      if (!target || target.disabled) return
+      // Camera shutter and sound toggle handle their own audio cues
+      if (target.id === 'btn-shutter' || target.id === 'btn-toggle-sound') return
+      playClickSound()
+    }
+
+    document.addEventListener('click', handleGlobalButtonClick)
+    return () => {
+      document.removeEventListener('click', handleGlobalButtonClick)
+    }
+  }, [])
+
   useEffect(() => {
     const handleKeyDown = e => {
       if (e.key === 'Escape') {
@@ -113,12 +132,12 @@ export default function App() {
   }, [isModalOpen, closeModal])
 
   useEffect(() => {
-    if (toastInfo) {
-      const timer = setTimeout(() => {
-        clearToast()
-      }, 4200)
-      return () => clearTimeout(timer)
-    }
+    if (!toastInfo) return
+    const duration = toastInfo.type === 'error' ? 2800 : 2300
+    const timer = setTimeout(() => {
+      clearToast()
+    }, duration)
+    return () => clearTimeout(timer)
   }, [toastInfo, clearToast])
 
   return (
@@ -200,9 +219,10 @@ export default function App() {
           onClick={() => setShowThemeModal(false)}
         >
           <div
-            className="pixel-box bg-[#151928] border-[#facc15] max-w-xl w-full p-4 sm:p-5 relative max-h-[90dvh] overflow-y-auto"
+            className="pixel-box bg-[#151928] border-[#facc15] max-w-xl w-full p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-5 relative max-h-[90dvh] overflow-y-auto rounded-t-2xl sm:rounded-none"
             onClick={e => e.stopPropagation()}
           >
+            <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-2.5 sm:hidden" />
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="pixel-font text-xs sm:text-sm text-[#facc15]">
@@ -227,9 +247,9 @@ export default function App() {
                     setTheme(key)
                     setShowThemeModal(false)
                   }}
-                  className="pixel-box bg-[#0f1320] border-[#334155] hover:border-[#facc15] p-3 min-h-[88px] text-center flex flex-col items-center justify-center gap-1.5 cursor-pointer"
+                  className="pixel-box bg-[#0f1320] border-[#334155] hover:border-[#facc15] p-3 min-h-[88px] text-center flex flex-col items-center justify-center gap-2 cursor-pointer text-[#facc15]"
                 >
-                  <span className="text-2xl">{t.emoji}</span>
+                  <PixelIcon name={t.icon || 'star'} size={22} />
                   <span className="pixel-font text-[9px] text-[#facc15]">
                     {t.name}
                   </span>
@@ -241,22 +261,27 @@ export default function App() {
         </div>
       )}
 
-      {/* TOAST NOTIFICATION */}
+      {/* AUTO-DISMISSING TOAST NOTIFICATION */}
       {toastInfo && (
         <div
           id="toast-box"
-          className={`fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pixel-box px-4 py-3 text-xs font-bold flex items-center gap-3 max-w-md w-[92%] ${
+          role="status"
+          aria-live="polite"
+          onClick={clearToast}
+          className={`fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] pixel-box px-3.5 py-2.5 text-xs font-bold flex items-center gap-2.5 max-w-md w-auto max-w-[92%] cursor-pointer transition-opacity duration-200 ${
             toastInfo.type === 'error'
               ? 'bg-rose-800 text-white border-rose-300'
               : 'bg-emerald-800 text-white border-[#facc15]'
           }`}
         >
-          <span className="flex-1 leading-snug">{toastInfo.message}</span>
-          <PixelCloseButton
-            size="sm"
-            onClick={clearToast}
-            ariaLabel="Dismiss notification"
+          <PixelIcon
+            name={toastInfo.type === 'error' ? 'warning' : 'check'}
+            size={14}
+            className={
+              toastInfo.type === 'error' ? 'text-rose-200' : 'text-[#facc15]'
+            }
           />
+          <span className="leading-snug">{toastInfo.message}</span>
         </div>
       )}
     </main>

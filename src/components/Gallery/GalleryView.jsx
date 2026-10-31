@@ -5,6 +5,7 @@
 
 import {useStore, MAX_STICKERS} from '../../lib/store'
 import PhotoThumbnail from './PhotoThumbnail'
+import {PixelIcon} from '../common/PixelUI'
 
 export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
   const photos = useStore.usePhotos()
@@ -24,9 +25,9 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
   return (
     <div
       id="subview-gallery"
-      className="flex-1 flex flex-col p-3 sm:p-4 bg-[#0b0e17] overflow-y-auto pb-6"
+      className="flex-1 flex flex-col p-3 sm:p-4 bg-[#0b0e17] overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:pb-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b-2 border-[#334155]">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 sm:gap-2 pb-3 mb-4 border-b-2 border-[#334155]">
         <div>
           <h2 className="pixel-font text-xs sm:text-sm text-[#facc15]">
             ATTENDEE GALLERY ({photos.length} SNAPS)
@@ -37,15 +38,16 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
           <button
             id="btn-back-to-camera-gallery"
             type="button"
             onClick={() => setView('camera')}
-            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[40px] bg-sky-500 hover:bg-sky-400 text-[#0b0e17] border-white font-bold"
+            className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2.5 min-h-[44px] bg-sky-500 hover:bg-sky-400 text-[#0b0e17] border-white font-bold justify-center"
             title="Return to the Camera to snap more photos (keeps all your images)"
           >
-            📷 BACK TO CAMERA
+            <PixelIcon name="camera" size={13} />
+            <span>BACK TO CAMERA</span>
           </button>
 
           <button
@@ -53,34 +55,41 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
             type="button"
             disabled={!canDownloadBatch}
             onClick={downloadStickerQueue}
-            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[40px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300"
+            className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2.5 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 justify-center"
             title="Download Batch: Aggregate your queued or captured stickers (up to 3) into a ZIP file"
           >
-            {stickerQueueDownloading
-              ? '⏳ ZIPPING...'
-              : `⬇️ DOWNLOAD BATCH (${
-                  qLen > 0 ? qLen : Math.min(readyPhotosCount, MAX_STICKERS)
-                }/${MAX_STICKERS})`}
+            <PixelIcon name="download" size={13} />
+            <span>
+              {stickerQueueDownloading
+                ? 'ZIPPING...'
+                : `DOWNLOAD BATCH (${
+                    qLen > 0 ? qLen : Math.min(readyPhotosCount, MAX_STICKERS)
+                  }/${MAX_STICKERS})`}
+            </span>
           </button>
 
           <button
             id="btn-open-queue-gallery"
             type="button"
             onClick={onShowStickerQueue}
-            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[40px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]"
+            className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2.5 min-h-[44px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15] justify-center"
           >
-            🎟️ STICKER QUEUE (
-            <span id="gallery-queue-count">{qLen}</span>/{MAX_STICKERS})
+            <PixelIcon name="ticket" size={13} />
+            <span>
+              STICKER QUEUE (<span id="gallery-queue-count">{qLen}</span>/
+              {MAX_STICKERS})
+            </span>
           </button>
 
           <button
             id="btn-reset-attendee-gallery"
             type="button"
             onClick={resetStationForNextAttendee}
-            className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2.5 min-h-[40px] bg-[#151928] text-rose-300 border-rose-400"
+            className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2.5 min-h-[44px] bg-[#151928] text-rose-300 border-rose-400 justify-center"
             title="Helpers: Wipe station for next student (asks 'Are you sure?' first)"
           >
-            🔄 NEXT ATTENDEE
+            <PixelIcon name="reset" size={12} />
+            <span>NEXT ATTENDEE</span>
           </button>
         </div>
       </div>
@@ -106,13 +115,16 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
               onClick={() => setView('camera')}
               className="pixel-btn text-[9px] sm:text-[10px] px-5 py-3 min-h-[44px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]"
             >
-              📷 BACK TO CAMERA (SNAP MORE PHOTOS)
+              <PixelIcon name="camera" size={14} />
+              <span>BACK TO CAMERA (SNAP MORE PHOTOS)</span>
             </button>
           </div>
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center text-center py-12 text-slate-400">
-          <span className="text-4xl mb-3">🖼️</span>
+          <div className="mb-3 text-[#facc15]">
+            <PixelIcon name="gallery" size={36} />
+          </div>
           <p className="pixel-font text-xs text-slate-200 mb-2">
             YOUR GALLERY IS EMPTY
           </p>
@@ -122,9 +134,10 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
           <button
             type="button"
             onClick={() => setView('camera')}
-            className="pixel-btn text-[9px] px-4 py-2 bg-[#9f1239] text-[#facc15] border-[#facc15]"
+            className="pixel-btn text-[9px] px-4 py-2.5 min-h-[44px] bg-[#9f1239] text-[#facc15] border-[#facc15]"
           >
-            📷 Go to Camera
+            <PixelIcon name="camera" size={13} />
+            <span>Go to Camera</span>
           </button>
         </div>
       )}

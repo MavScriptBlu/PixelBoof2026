@@ -1,77 +1,74 @@
-# PixelBoof — Mobile-First UI Overhaul, Homepage Privacy Notice & Auto-Email Batch Delivery
+# PixelBoof — Zero-Emoji 8-Bit SVG Icon System, Centered Press Start Button, Chiptune Audio & Mobile Viewport Polish
 
-Redesign the PixelBoof photobooth interface so the live camera and generated stickers occupy maximum screen space on both phones and school kiosk computers, keep the retro `pixel-font` privacy disclaimer exclusively on the **Homepage (Press Start screen)**—which appears on every page refresh and whenever **Next Attendee** is clicked—and add **Auto-Email / Send to Booth (`mavscriptblue@gmail.com`)** so students using their personal phones can send their 3-sticker batch straight to your email alongside the Kiosk ZIP download.
+Upgrade PixelBoof's visual and tactile craft by eliminating every OS emoji across the entire photobooth in favor of custom 8-bit pixel and geometric SVG icons, fixing the vertical and horizontal alignment of the `PRESS START` play triangle on the homepage, and pairing full Web Audio chiptune sound effects with mobile-first touch ergonomics.
 
-## User Review & Critical Decisions
+### User Review & Critical Decisions
 
 > [!IMPORTANT]
-> This revised plan incorporates your latest feedback alongside our earlier layout choices:
+> This plan reflects your confirmed preferences from our design alignment questions:
 
-- **Confirmed Decision 1 — Privacy Disclaimer Strictly on the Homepage**:
-  - The stylized `pixel-font` notice (`Note: No images are saved; data is erased immediately upon page refresh.`) will appear **only on the Homepage (`PRESS START` screen)**—not as a persistent bar across other views.
-  - Both **refreshing the page** and clicking **🔄 Next Attendee** will stop the active camera stream, wipe all in-memory photos/queue data, and return the screen directly to the **Homepage** so the next student always sees the title screen and privacy note first.
-- **Confirmed Decision 2 — Auto-Send / Email Sticker Batch to `mavscriptblue@gmail.com` (Personal Phones + Kiosk ZIP)**:
-  - When an attendee enters their **Full Name** and **High School** in the Sticker Queue (`0/3`) and submits their batch:
-    1. **Auto-Email to Organizer (`mavscriptblue@gmail.com`)**: The server (`/api/email-sticker-batch`) packages their queued stickers into `${Name}-${School}_PixelBoof_${count}stickers.zip` in memory (saving nothing to disk) and emails the ZIP attachment directly to `mavscriptblue@gmail.com` (using server-side SMTP/email transport, plus a mobile Web Share / mail fallback if offline).
-    2. **Kiosk Local ZIP Download**: Also keeps the instant browser `.zip` download for school computers with webcams ("kiosk mode").
-- **Confirmed Decision 3 — Compact Dock with Pop-Up Lens Drawer & Inline Thumbnails**:
-  - Replaces the tall multi-row category/chip panels on the Camera screen with a single compact bottom dock (`[🎨 Active Lens]`, `[📸 Shutter]`, and an inline row of recent sticker thumbnails) plus a pop-up **Lens Drawer** modal.
-- **Confirmed Decision 4 — Skip Preview by Default & Go Straight to Large Sticker Result**:
-  - Snapping a photo immediately starts generating the `gemini-nano-banana-2.1` sticker and automatically opens the large-format **Sticker Inspection Modal** once ready.
+- **Confirmed Decision 1 — Zero Emojis Across the App & Refined MSTC IT Header Badge**:
+  - Remove all Unicode emojis (`📷`, `🎟️`, `🖼️`, `🔄`, `⬇️`, `✨`, `🪄`, `🎨`, `🕹️`, `❓`, `✏️`, etc.) from buttons, lens drawers, category tabs, modals, empty states, toasts, and header badges.
+  - Replace them with a unified **8-Bit Pixel & Geometric SVG Icon System** rendered on a crisp pixel grid (`shape-rendering="crispEdges"`) that matches the retro arcade aesthetic, including a clean geometric pixel emblem inside the `MSTC IT` header badge.
+- **Confirmed Decision 2 — Centered 8-Bit Pixel Play Triangle Inline with `PRESS START`**:
+  - Replace the misaligned Unicode `▶` character in the homepage start button with a custom stepped 8-bit pixel play triangle SVG (`14×14px` viewBox).
+  - Align the SVG icon and `PRESS START` text using a single flex row (`inline-flex items-center justify-center gap-2.5 leading-none`) with optical baseline compensation for the `Press Start 2P` bitmap font so the play icon and text sit dead-center horizontally and vertically.
+- **Confirmed Decision 3 — 8-Bit Chiptune Sound Effects & Mobile-First Viewport Polish**:
+  - Wire Web Audio API 8-bit sound effects across interactive controls (menu/button blips, lens selection chimes, mechanical arcade shutter snap, queue confirmation tone, and C-major level-complete arpeggio on sticker completion), plus a header sound toggle so kiosk helpers or attendees can mute/unmute audio anytime.
+  - Enforce mobile-first touch ergonomics: $\ge 44\times44\text{px}$ touch targets, `100dvh` zero-scroll camera framing, safe-area inset support (`env(safe-area-inset-bottom)`), and clean visual hierarchy without visual clutter.
 
 ---
 
-## 1. Overview & Core Concept
+### 1. Overview & Core Concept
 
-- **What It Does**: Provides a fast, mobile-friendly and kiosk-ready AI sticker photobooth for Mid-State Technical College's November 13th Tech-Con where students snap photos, transform into 16-bit die-cut stickers, and either email their 3-sticker print batch to `mavscriptblue@gmail.com` from their personal phones or download the batch ZIP directly on the booth computers.
-- **Target Audience / Persona**: High school attendees on personal smartphones (iOS/Android) and booth helpers operating school computers with webcams.
-- **Key Value**: Solves the mobile viewport crunch so the camera and sticker art fill 80%+ of the screen, ensures every new attendee starts on the clean Homepage with the privacy disclaimer, and seamlessly routes personal-phone sticker batches to your inbox for Cricut printing.
+- **What It Does**: Transforms PixelBoof into a cohesive, authentic 16-bit arcade photobooth where every icon, badge, button, and sound effect is custom-crafted on a pixel grid rather than relying on mismatched system emojis.
+- **Target Audience / Persona**: High school students on personal smartphones (375px–430px viewports) and booth helpers operating Mid-State Technical College kiosk computers.
+- **Key Value**: Eliminates the inconsistent, out-of-place look of OS emojis and baseline-shifted Unicode symbols, replacing them with razor-sharp arcade iconography, responsive touch hitboxes, and nostalgic chiptune audio feedback.
 
 ---
 
-## 2. User Experience & Visual Design
+### 2. User Experience & Visual Design
 
 - **Key User Flows**:
-  1. **Homepage (`PRESS START` Screen — Shown on Refresh & Next Attendee)**:
-     - Displays the retro `PIXEL BOOF` arcade logo, the primary `▶ PRESS START` button, and the stylish retro `pixel-font` info box:
-       `Note: No images are saved; data is erased immediately upon page refresh.`
-     - Starts completely clean on page load (no pre-seeded demo stickers cluttering the queue).
-     - Clicking **🔄 Next Attendee** from either the Gallery or the Sticker Queue modal stops the webcam, clears all photos/queue items, and returns straight to this Homepage.
-  2. **Full-Viewport Camera & Compact Bottom Dock**:
-     - Once `▶ PRESS START` is tapped, the live camera feed fills 80%+ of the viewport height with floating top-right utility buttons (`🔄 Flip`, `📁 Upload`).
-     - The single-row bottom dock houses:
-       - **Left**: Active Lens trigger button (opens the **Pop-Up Lens Drawer** with the 6 category tabs, 40+ lenses, Random, and Custom Prompt + PixelBot coach).
-       - **Center**: Tactile round Arcade Shutter button.
-       - **Right**: Single compact inline row of recent snapped sticker thumbnails.
-  3. **Instant Transform to Large Sticker Result**:
-     - Pressing the shutter immediately triggers `gemini-nano-banana-2.1` generation (`instantTransform: true` by default) with a shimmering loading state in the inline thumbnail strip, and automatically opens the enlarged **Focused Sticker Modal** when ready.
-  4. **Sticker Queue (`0/3`) — Auto-Email for Phones & ZIP for Kiosks**:
-     - Inside the Sticker Queue modal, students enter their **Attendee Full Name** and **High School**.
-     - Clicking **📧 Send & Download Batch (3/3)** automatically sends the ZIP package (`Name-School_PixelBoof_3stickers.zip`) to **`mavscriptblue@gmail.com`** via `/api/email-sticker-batch` (so phone users' stickers arrive straight in your inbox) while also offering the local ZIP download for kiosk computers.
+  1. **Header & Brand Identity (`MSTC IT` Badge + Action Bar)**:
+     - The upper-left `MSTC IT` badge features a crisp geometric pixel microchip/monitor SVG emblem (no cartoon robot face or emoji) paired with `MSTC IT` and `PIXEL BOOF` typography.
+     - Header action buttons (`DOWNLOAD BATCH`, `STICKERS: X/3`, `GALLERY / CAMERA`, `NEXT ATTENDEE`, and a new `SOUND ON/OFF` toggle) use crisp 8-bit pixel SVG icons (download arrow, ticket stub, photo frame, camera lens, reset arrows, speaker icon) aligned inline with `Press Start 2P` labels.
+  2. **Homepage (`PRESS START` Screen)**:
+     - Displays the `PIXEL BOOF` hero title, the primary CTA button containing a custom stepped 8-bit pixel play triangle SVG centered inline with `PRESS START`, and the pixel-bordered privacy notice (`Note: No images are saved; data is erased immediately upon page refresh.`).
+     - Tapping `PRESS START` triggers an 8-bit arcade start blip and launches the live camera viewport.
+  3. **Live Camera Stage & Pop-Up Lens Drawer**:
+     - Floating camera utility buttons (`Flip`, `Upload`) and the bottom camera dock (`Active Lens`, `Arcade Shutter`, inline sticker thumbnails) use crisp pixel SVG icons with $\ge 44\times44\text{px}$ tap hitboxes.
+     - Opening the **Lens Drawer** displays category deck tabs (`Arcade Classics`, `Fantasy & RPG`, `Sci-Fi & Action`, `Fursona & Mascots`, `Cards & Toons`, `Pride & Duos`), `Surprise Random Lens`, and `Custom Prompt` with geometric pixel SVG emblems instead of emojis.
+  4. **Focused Sticker Modal, Gallery & Sticker Queue**:
+     - Sticker inspection actions (`Save for Sticker`, `In Sticker Queue`, `Edit Sticker`, `Show Sticker / Compare Photo`, `PNG`, `Share`) and the Sticker Queue modal (`Send to Gmail`, `Kiosk ZIP Download`, `Clear`) use pixel SVG icons and play subtle 8-bit audio cues on interaction.
 
 - **Visual Identity & Theme**:
-  - *Aesthetic Direction*: 16-bit CRT Arcade Cabinet with Mid-State Technical College Maroon (`#8B1E41`), Arcade Gold (`#ffcc00`), and Electric Cyan (`#06b6d4`) on deep CRT obsidian (`#120d18`).
-  - *Typography & Hierarchy*: `Press Start 2P` (`pixel-font`) for titles, arcade buttons, and the Homepage privacy disclaimer box; high-contrast sans-serif for inputs and helper labels.
-  - *Responsive Spatial Budget*:
-    - Compact Top Header: `48px–52px`
-    - Camera / Gallery Stage: `80%–84%` of `100dvh`
-    - Single-Row Bottom Camera Dock: `68px–74px`
+  - *Aesthetic Direction*: Authentic 16-bit Arcade Cabinet UI with Mid-State Maroon (`#9f1239`), Arcade Gold (`#facc15`), Electric Sky (`#38bdf8`), and CRT Obsidian (`#0b0e17`).
+  - *Typography & Icon Alignment*: `Press Start 2P` (`pixel-font`) paired with `shape-rendering="crispEdges"` SVG icons inside `inline-flex items-center justify-center gap-2 leading-none` containers so icons never sit above or below the bitmap text baseline.
+  - *Mobile Spatial Budget*:
+    - Top Header Bar: Compact (`48px–54px`) with icon-consistent buttons.
+    - Camera Viewport Stage: `80%+` of `100dvh` with zero vertical page scroll.
+    - Bottom Camera Dock: `68px–76px` with safe-area bottom padding and thumb-friendly controls.
 
 ---
 
-## 3. Key Product Decisions & Trade-Offs
+### 3. Key Product Decisions & Trade-Offs
 
-- **Decision 1: Homepage-Only Privacy Notice & True Station Reset**
-  - *Chosen Approach*: Display the `pixel-font` privacy box (`Note: No images are saved; data is erased immediately upon page refresh.`) exclusively on the Homepage (`!videoActive`), and make `resetStationForNextAttendee` stop the active camera stream so the booth returns to the Homepage after each student.
-  - *Why*: Gives the active camera and gallery views maximum vertical room while guaranteeing that every student stepping up to the kiosk (or opening the app on their phone) sees the privacy disclaimer first.
+- **Decision 1: Unified `PixelIcon` SVG Component Over Unicode Emojis**
+  - *Chosen Approach*: Build a dedicated `PixelIcon` SVG registry using stepped rectilinear paths (`shape-rendering="crispEdges"`) for all UI actions and category themes, completely removing emoji strings from rendered UI components and toast messages.
+  - *Why*: OS emojis render differently across iOS, Android, Windows, and macOS, clashing with pixel typography and breaking vertical button alignment. Custom pixel SVGs inherit `currentColor`, scale cleanly, and preserve a true arcade cabinet aesthetic.
 
-- **Decision 2: Stateless In-Memory Auto-Email to `mavscriptblue@gmail.com`**
-  - *Chosen Approach*: Add a stateless Express endpoint (`POST /api/email-sticker-batch`) that accepts the attendee's Name, High School, and base64 sticker PNGs, builds the `.zip` buffer in RAM, and emails it directly to `mavscriptblue@gmail.com` via Nodemailer/SMTP (configured via environment variables in `.env.example`, with automatic Web Share / email fallback on mobile if SMTP credentials aren't set), then immediately discards the buffer from memory.
-  - *Why*: Students on personal phones don't have a way to plug into the Cricut computer; emailing the batch directly from the backend means high schoolers never have to log into Google OAuth on their phones, and zero images are ever saved to disk or a database.
+- **Decision 2: Optical Baseline Centering for `Press Start 2P` Buttons**
+  - *Chosen Approach*: Replace Unicode symbols (`▶`, `▲`, `✕`) with explicit `viewBox="0 0 16 16"` pixel SVGs (`shrink-0 block`) inside `inline-flex items-center justify-center` wrappers with `leading-none`.
+  - *Why*: The `Press Start 2P` bitmap font has an asymmetric ascender/descender box that causes inline text symbols like `▶` to drift off-center; explicit SVG dimensions inside a flex container guarantee mathematical and optical centering.
+
+- **Decision 3: Zero-Dependency Web Audio Chiptune Synthesizer with Mute Toggle**
+  - *Chosen Approach*: Synthesize all 8-bit sound effects in real time via the browser's native Web Audio API (`triangle`, `square`, and filtered noise oscillators) with a persistent mute toggle in the Zustand store.
+  - *Why*: Requires zero external audio file downloads, works offline on school networks, adds zero latency on button taps, and respects browser autoplay policies.
 
 ---
 
-## 4. Technical Architecture & Data Strategy *(Technical Reference)*
+### 4. Technical Architecture & Data Strategy *(Technical Reference)*
 
 - **Architecture & Component Diagram**:
 
@@ -79,48 +76,40 @@ Redesign the PixelBoof photobooth interface so the live camera and generated sti
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                     App Shell (100dvh, overflow-hidden)                 │
 │  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │ Compact Top Header (PIXEL BOOF · Stickers 0/3 · Camera/Gallery)   │  │
+│  │ Header: [MSTC IT Pixel Emblem] PIXEL BOOF   [Audio][Queue][Gal]   │  │
 │  ├───────────────────────────────────────────────────────────────────┤  │
 │  │                                                                   │  │
-│  │   STATE A: HOMEPAGE (On Refresh or "Next Attendee")               │  │
+│  │   HOMEPAGE SCREEN (!videoActive)                                  │  │
 │  │   ┌───────────────────────────────────────────────────────────┐   │  │
-│  │   │                     PIXEL BOOF                            │   │  │
-│  │   │                  [ ▶ PRESS START ]                        │   │  │
-│  │   │  ┌─────────────────────────────────────────────────────┐  │   │  │
-│  │   │  │ Note: No images are saved; data is erased           │  │   │  │
-│  │   │  │ immediately upon page refresh. (pixel-font)         │  │   │  │
-│  │   │  └─────────────────────────────────────────────────────┘  │   │  │
+│  │   │                      PIXEL BOOF                           │   │  │
+│  │   │         ┌─────────────────────────────────────┐           │   │  │
+│  │   │         │   [8-Bit Play SVG]  PRESS START     │           │   │  │
+│  │   │         └─────────────────────────────────────┘           │   │  │
+│  │   │       [Privacy Box: No images saved on refresh]           │   │  │
 │  │   └───────────────────────────────────────────────────────────┘   │  │
 │  │                                                                   │  │
-│  │   STATE B: ACTIVE CAMERA VIEW (80%+ Viewport Height)              │  │
+│  │   ACTIVE CAMERA & MOBILE VIEWPORT (videoActive)                   │  │
 │  │   ┌───────────────────────────────────────────────────────────┐   │  │
-│  │   │ Live Webcam Feed + Floating [🔄 Flip] [📁 Upload]         │   │  │
+│  │   │ Live Webcam Feed + Floating SVG Controls [Flip] [Upload]  │   │  │
 │  │   ├───────────────────────────────────────────────────────────┤   │  │
-│  │   │ Single-Row Bottom Dock:                                   │   │  │
-│  │   │ [🎨 Active Lens ▲]     ( 📸 Shutter )     [Thumb1][Thumb2]│   │  │
+│  │   │ Bottom Dock: [PixelIcon + Lens]  (Shutter)  [Thumbnails]  │   │  │
 │  │   └───────────────────────────────────────────────────────────┘   │  │
 │  └───────────────────────────────────────────────────────────────────┘  │
 │                                                                         │
-│  Pop-Up Modals & Backend Routes:                                        │
-│  ├── LensDrawerModal (6 Category Tabs · 40+ Lenses · Custom Prompt)     │
-│  ├── FocusedPhotoModal (Large Hero Sticker · 1-Line AI Edit · Queue)    │
-│  ├── StickerQueueModal ──► POST /api/email-sticker-batch                │
-│  │                         (Auto-emails ZIP to mavscriptblue@gmail.com  │
-│  │                          + Kiosk Local ZIP Download)                 │
-│  └── ChatBotPanel Modal (Flash Lite / Flash Prompt Coach)               │
+│  Shared Systems:                                                        │
+│  ├── PixelIcon SVG Registry (crispEdges 16x16 stepped pixel vectors)    │
+│  └── 8-Bit Web Audio Synth (Click · Select · Shutter · Success · Mute)  │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Data Model & State**:
-  - `isHomepage` / `videoActive`: Managed so initial load (`init` with zero demo photos) and `resetStationForNextAttendee()` both set `cameraStarted: false`, stopping any active media tracks and returning to the Homepage.
-  - `instantTransform: true`: Defaulted to `true` so shutter snaps immediately generate the sticker and open `FocusedPhotoModal` upon completion.
-  - `showLensDrawer: false`: Controls the pop-up Lens Selector sheet from the bottom dock.
-  - `emailSending: false`: Tracks in-flight status when auto-emailing the sticker batch to `mavscriptblue@gmail.com`.
+- **Data Model & State Updates**:
+  - `soundEnabled: true` in store state (persisted in `localStorage`) with `toggleSound()` action so users or booth helpers can mute/unmute all 8-bit Web Audio effects.
+  - `icon` identifier on each theme and mode entry in `modes.js` (e.g., `'gamepad'`, `'sword'`, `'laser'`, `'paw'`, `'card'`, `'heart'`, `'star'`, `'pencil'`, `'question'`) mapped directly to `<PixelIcon name={...} />` so zero emojis are rendered anywhere in the lens drawer, camera dock, or modals.
 
 - **Interactive Component & State Mapping**:
-  - **Homepage (`CameraView` when `!videoActive`)**:
-    - Renders the arcade title, `▶ PRESS START`, and the `pixel-font` box containing `Note: No images are saved; data is erased immediately upon page refresh.`
-  - **Next Attendee Reset (`resetStationForNextAttendee`)**:
-    - Clears `photos`, `stickerQueue`, `attendeeName`, `attendeeSchool`, `capturedPreview`, and signals `CameraView` to stop the webcam stream so the Homepage is immediately displayed.
-  - **Batch Submission (`StickerQueueModal` & `POST /api/email-sticker-batch`)**:
-    - Generates `${prefix}_PixelBoof_${count}stickers.zip` in memory and sends it to `mavscriptblue@gmail.com` via `/api/email-sticker-batch`, while also supporting one-click local ZIP download on kiosk computers and native mobile file sharing (`navigator.share`) on phones.
+  - **Homepage `PRESS START` Button**:
+    - Uses `inline-flex items-center justify-center gap-2.5 leading-none` containing `<PixelIcon name="play" className="w-3.5 h-3.5 shrink-0" />` and `<span>PRESS START</span>`, triggering `playClickSound()` and `startVideo()` on tap.
+  - **MSTC IT Header Badge (`MstcBadge`)**:
+    - Renders a crisp geometric pixel emblem (8-bit microchip/terminal crest) inside the maroon pixel frame alongside `MSTC IT`.
+  - **Global Button & Modal Feedback**:
+    - Every interactive button across Header, Camera, Lens Drawer, Gallery, Focused Sticker Modal, and Sticker Queue Modal renders `<PixelIcon />` vectors, enforces $\ge 44\text{px}$ mobile touch hitboxes where appropriate, and triggers subtle 8-bit chiptune audio feedback when `soundEnabled` is active.
