@@ -12,11 +12,10 @@ import shuffle from 'lodash.shuffle'
 import modes, {THEMES} from './modes'
 import imageData from './imageData'
 import gen, {transformPhotoToPixelSticker} from './gemini'
-import {getAccessToken} from './gmailAuth'
 
 export const MAX_STICKERS = 3
 export const IMAGE_MODEL = 'gemini-nano-banana-2.1'
-export const ORGANIZER_EMAIL = 'Booth Print Queue'
+export const ORGANIZER_EMAIL = 'mavscriptblue@gmail.com'
 const modeKeys = Object.keys(modes)
 
 const stickerPromptSuffix =
@@ -529,22 +528,26 @@ const useStoreBase = create(
 
     /*
      * Packages the attendee's queued stickers into a ZIP in memory,
-     * sends it to mavscriptblue@gmail.com via Gmail API (using client OAuth token) or Gmail SMTP,
+     * sends it to mavscriptblue@gmail.com via the backend /api/email-sticker-batch endpoint,
      * and optionally downloads the ZIP locally on kiosk computers.
      */
     processStickerBatch: async ({
       downloadLocal = false,
       autoEmail = true,
-      accessToken = null
+      shareOnMobile = false
     } = {}) => {
-      const {stickerQueue, attendeeName, attendeeSchool} = get()
+      const {stickerQueue, photos, attendeeName, attendeeSchool} = get()
 
-      // Strictly use the stickers the attendee selected for their Sticker Queue (max 3)
-      const targetIds = [...stickerQueue].slice(0, MAX_STICKERS)
+      // Use explicitly queued stickers first (strictly capped at 3); if none are queued yet, aggregate up to 3 finished stickers
+      let targetIds = [...stickerQueue].slice(0, MAX_STICKERS)
+      if (targetIds.length === 0) {
+        const readyPhotos = photos.filter(p => !p.isBusy).slice(0, MAX_STICKERS)
+        targetIds = readyPhotos.map(p => p.id)
+      }
 
       if (targetIds.length === 0) {
         get().showToast(
-          'Pick up to 3 favorite photos and click "Save to Queue" before sending or downloading!',
+          'Snap or queue at least 1 sticker before downloading or sending a batch!',
           'error'
         )
         return {ok: false}
@@ -562,6 +565,7 @@ const useStoreBase = create(
 
       try {
         const zip = new JSZip()
+        const shareFiles = []
 
         for (let i = 0; i < targetIds.length; i++) {
           const id = targetIds[i]
@@ -571,6 +575,9 @@ const useStoreBase = create(
             const blob = await response.blob()
             const pngName = `${prefix}_sticker_${i + 1}.png`
             zip.file(pngName, blob)
+            if (typeof File !== 'undefined') {
+              shareFiles.push(new File([blob], pngName, {type: 'image/png'}))
+            }
           }
         }
 
@@ -588,60 +595,55 @@ const useStoreBase = create(
           URL.revokeObjectURL(url)
         }
 
-        // 2. Send the ZIP batch to mavscriptblue@gmail.com via Gmail
+        // 2. Send the ZIP batch to mavscriptblue@gmail.com via backend
         if (autoEmail) {
-          const token = accessToken || (await getAccessToken())
           const zipBase64 = await blobToBase64(zipBlob)
-          const headers = {'Content-Type': 'application/json'}
-          if (token) {
-            headers.Authorization = `Bearer ${token}`
-          }
-
-          let sentSuccess = false
-          try {
-            const res = await fetch('/api/email-sticker-batch', {
-              method: 'POST',
-              headers,
-              body: JSON.stringify({
-                attendeeName: rawName,
-                attendeeSchool: rawSchool,
-                zipBase64,
-                fileName: zipFileName,
-                stickerCount: targetIds.length
-              })
+          const res = await fetch('/api/email-sticker-batch', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+              attendeeName: rawName,
+              attendeeSchool: rawSchool,
+              zipBase64,
+              fileName: zipFileName,
+              stickerCount: targetIds.length
             })
-            const data = await res.json().catch(() => ({}))
+          })
+          const data = await res.json().catch(() => ({}))
 
-            if (res.ok && data?.ok) {
-              sentSuccess = true
-            } else if (data?.needsAuth) {
-              get().showToast(
-                'Please sign in with Google to send your sticker batch via Gmail!',
-                'error'
-              )
-              return {ok: false, needsAuth: true}
-            }
-          } catch {
-            // Fallback to direct client-side Gmail API call below if backend route is unreachable
-          }
-
-          if (!sentSuccess) {
-            get().showToast(
-              'Please sign in with Google to send your sticker batch via Gmail!',
-              'error'
+          if (!res.ok || !data?.ok) {
+            throw new Error(
+              data?.error || 'Could not email sticker batch from server.'
             )
-            return {ok: false, needsAuth: true}
           }
 
           set({
             lastEmailResult: {
               ok: true,
-              recipientEmail: 'Booth Print Queue',
-              transport: 'gmail-api',
+              recipientEmail: data?.recipientEmail || ORGANIZER_EMAIL,
+              transport: data?.transport || 'gmail-smtp',
+              previewUrl: data?.previewUrl || null,
               fileName: zipFileName,
               timestamp: Date.now()
             }
           })
+        }
+
+        // 3. Optional native mobile share sheet for personal phones
+        if (
+          shareOnMobile &&
+          typeof navigator !== 'undefined' &&
+          navigator.canShare &&
+          shareFiles.length > 0 &&
+          navigator.canShare({files: shareFiles})
+        ) {
+          await navigator
+            .share({
+              title: `${rawName} (${rawSchool}) — PixelBoof Stickers`,
+              text: `PixelBoof stickers for ${rawName} (${rawSchool}) — Send to ${ORGANIZER_EMAIL}`,
+              files: shareFiles
+            })
+            .catch(() => {})
         }
 
         if (downloadLocal && autoEmail) {

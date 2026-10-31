@@ -7,6 +7,7 @@ import {useStore} from '../../lib/store'
 import imageData from '../../lib/imageData'
 import modes from '../../lib/modes'
 import PixelLoader from '../common/PixelLoader'
+import Share from '../common/Share'
 
 export default function PhotoThumbnail({photo, onClick}) {
   const stickerQueue = useStore.useStickerQueue()
@@ -80,9 +81,19 @@ export default function PhotoThumbnail({photo, onClick}) {
           ) : inQ ? (
             '✅ QUEUED'
           ) : (
-            '🏷️ SAVE FOR STICKER'
+            '🏷️ QUEUE'
           )}
         </button>
+
+        {!isBusy && imgSrc && (
+          <Share
+            compact
+            url={imgSrc}
+            fileName={`pixelboof-${id}.png`}
+            modeName={m.name}
+          />
+        )}
+
         <button
           type="button"
           onClick={handleDelete}

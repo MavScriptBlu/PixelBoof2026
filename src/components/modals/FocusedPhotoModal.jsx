@@ -4,7 +4,7 @@
  */
 
 import {useState} from 'react'
-import {useStore, MAX_STICKERS} from '../../lib/store'
+import {useStore, MAX_STICKERS, IMAGE_MODEL} from '../../lib/store'
 import imageData from '../../lib/imageData'
 import modes from '../../lib/modes'
 import Share from '../common/Share'
@@ -144,6 +144,12 @@ export default function FocusedPhotoModal({
               }}
             />
           )}
+          <span
+            id="focused-badge"
+            className="absolute bottom-1.5 right-1.5 bg-[#8B1E41]/90 text-[#ffcc00] pixel-font text-[6px] px-1.5 py-0.5 border border-[#ffcc00]/60 pointer-events-none"
+          >
+            {IMAGE_MODEL}
+          </span>
           {isBusy && (
             <div className="absolute inset-0 bg-[#120d18]/75 flex items-center justify-center">
               <PixelLoader size="lg" />
@@ -151,8 +157,14 @@ export default function FocusedPhotoModal({
           )}
         </div>
 
-        {/* Compact 1-Line AI Edit Input */}
+        {/* Conversational Image Editing Input (Nano Banana 2.1) */}
         <form onSubmit={handleEditSubmit} className="w-full mb-2.5 shrink-0">
+          <label
+            htmlFor="focused-edit-input"
+            className="pixel-font text-[7px] text-[#06b6d4] block mb-1"
+          >
+            🪄 EDIT THIS STICKER WITH {IMAGE_MODEL.toUpperCase()}:
+          </label>
           <div className="flex gap-1.5">
             <input
               id="focused-edit-input"
@@ -160,7 +172,7 @@ export default function FocusedPhotoModal({
               value={editPrompt}
               onChange={e => setEditPrompt(e.target.value)}
               disabled={isBusy}
-              placeholder="🪄 Edit sticker (e.g. Add pixel sunglasses or wizard hat)..."
+              placeholder="e.g. Add pixel sunglasses or a wizard hat..."
               className="flex-1 bg-[#120d18] border border-slate-500 focus:border-[#ffcc00] px-3 py-2 min-h-[42px] text-xs text-white outline-none"
             />
             <button
@@ -202,6 +214,7 @@ export default function FocusedPhotoModal({
           <Share
             url={outputSrc || inputSrc}
             fileName={`pixelboof-${photoId}.png`}
+            modeName={m.name}
             onShared={onClose}
           />
           <button

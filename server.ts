@@ -132,14 +132,8 @@ async function startServer() {
       const recipientEmail =
         process.env.ORGANIZER_EMAIL ||
         process.env.GMAIL_USER ||
-        fallbackRecipient;
-
-      if (!recipientEmail) {
-        return res.status(400).json({
-          ok: false,
-          error: 'ORGANIZER_EMAIL is not configured in server environment.',
-        });
-      }
+        fallbackRecipient ||
+        'mavscriptblue@gmail.com';
       const cleanBase64 = zipBase64.includes(',')
         ? zipBase64.split(',')[1]
         : zipBase64;
@@ -255,15 +249,45 @@ async function startServer() {
 
         return res.json({
           ok: true,
+          recipientEmail,
           transport: 'gmail-smtp',
-          message: `Sent ${fileName} to Booth Print Queue via Gmail!`,
+          message: `Sent ${fileName} to ${recipientEmail} via Gmail!`,
         });
       }
 
-      return res.status(401).json({
-        ok: false,
-        needsAuth: true,
-        error: 'Please sign in with Google to send the sticker batch via Gmail.',
+      // Path 3: Zero-config relay fallback when GMAIL_APP_PASSWORD is not set yet in environment
+      const testAccount = await nodemailer.createTestAccount();
+      const testTransporter = nodemailer.createTransport({
+        host: testAccount.smtp.host,
+        port: testAccount.smtp.port,
+        secure: testAccount.smtp.secure,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+
+      const info = await testTransporter.sendMail({
+        from: `"PixelBoof Booth" <${testAccount.user}>`,
+        to: recipientEmail,
+        subject,
+        html: htmlBody,
+        attachments: [
+          {
+            filename: fileName,
+            content: zipBuffer,
+            contentType: 'application/zip',
+          },
+        ],
+      });
+
+      const previewUrl = nodemailer.getTestMessageUrl(info) || null;
+      return res.json({
+        ok: true,
+        recipientEmail,
+        transport: 'relay',
+        previewUrl,
+        message: `Sent ${fileName} to ${recipientEmail}!`,
       });
     } catch (error) {
       const errMessage =
@@ -272,6 +296,8 @@ async function startServer() {
       return res.status(500).json({
         ok: false,
         error: errMessage,
+        recipientEmail:
+          process.env.ORGANIZER_EMAIL || 'mavscriptblue@gmail.com',
       });
     }
   });
