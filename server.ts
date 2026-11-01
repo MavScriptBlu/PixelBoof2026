@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI, ThinkingLevel } from '@google/genai';
@@ -55,7 +56,7 @@ async function startServer() {
         },
       });
 
-      const parts: Array<Record<string, unknown>> = [];
+      const parts = [];
 
       if (inputFile && typeof inputFile === 'string' && inputFile.includes(',')) {
         const mimeMatch = inputFile.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
@@ -84,10 +85,10 @@ async function startServer() {
       );
 
       let response = null;
-      let imageUrl: string | null = null;
+      let imageUrl = null;
       let AccompanyingText = '';
       let usedModel = model;
-      let lastError: unknown = null;
+      let lastError = null;
 
       for (const candidateModel of candidateModels) {
         try {
@@ -424,7 +425,7 @@ async function startServer() {
           ? message.slice(0, 400)
           : 'Analyze this image and suggest 3 creative pixel sticker edit prompts wrapped in double quotes.';
 
-      let messagePayload: string | Array<Record<string, unknown>> = textPrompt;
+      let messagePayload = textPrompt;
       if (image && typeof image === 'string' && image.includes(',')) {
         const mimeMatch = image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,/);
         const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
@@ -452,7 +453,7 @@ async function startServer() {
 
       let response = null;
       let usedChatModel = selectedModel;
-      let lastChatErr: unknown = null;
+      let lastChatErr = null;
 
       for (const candidate of chatCandidateModels) {
         try {
@@ -522,23 +523,159 @@ async function startServer() {
     }
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  const distPath = path.join(__dirname, 'dist');
+  const distAssetsPath = path.join(distPath, 'assets');
+  const distIndexPath = path.join(distPath, 'index.html');
+  const isDevCommand = process.env.npm_lifecycle_event === 'dev';
+  const wantsProduction =
+    !isDevCommand &&
+    (process.env.NODE_ENV === 'production' ||
+      process.env.npm_lifecycle_event === 'start');
+
+  if (wantsProduction && !fs.existsSync(distIndexPath)) {
+    try {
+      console.log('Building production bundle via Vite...');
+      const { build } = await import('vite');
+      await build();
+    } catch (buildErr) {
+      console.error('Vite build on startup failed:', buildErr);
+    }
+  }
+
+  const isProduction = wantsProduction && fs.existsSync(distIndexPath);
+
+  // Serve built /assets files if they exist on disk (works in both dev and prod)
+  if (fs.existsSync(distAssetsPath)) {
+    app.use(
+      '/assets',
+      express.static(distAssetsPath, {
+        fallthrough: true,
+        setHeaders: (res, filePath) => {
+          if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
+            res.setHeader(
+              'Content-Type',
+              'application/javascript; charset=utf-8'
+            );
+          } else if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
+          }
+        },
+      })
+    );
+  }
+
+  // Guard /assets/* so stale cached index.html bundle hashes (e.g. index-Bo3WyLWz.js) NEVER fall through to text/html
+  app.use('/assets', (req, res, next) => {
+    const reqPath = req.path || '';
+    const baseName = path.basename(reqPath);
+
+    if (baseName.endsWith('.js') || baseName.endsWith('.mjs')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+
+      if (!isProduction && baseName.startsWith('index-')) {
+        // Browser had a cached production index.html against the Vite dev server; boot the live Vite entry
+        return res.status(200).send(`import('/index.tsx');\n`);
+      }
+
+      if (fs.existsSync(distAssetsPath) && baseName.startsWith('index-')) {
+        const files = fs.readdirSync(distAssetsPath);
+        const currentEntryJs = files.find(
+          f => f.startsWith('index-') && f.endsWith('.js')
+        );
+        if (currentEntryJs) {
+          return res.sendFile(path.join(distAssetsPath, currentEntryJs));
+        }
+      }
+
+      return res
+        .status(404)
+        .send('// Asset not found; please refresh page.\n');
+    }
+
+    if (baseName.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+
+      if (fs.existsSync(distAssetsPath) && baseName.startsWith('index-')) {
+        const files = fs.readdirSync(distAssetsPath);
+        const currentEntryCss = files.find(
+          f => f.startsWith('index-') && f.endsWith('.css')
+        );
+        if (currentEntryCss) {
+          return res.sendFile(path.join(distAssetsPath, currentEntryCss));
+        }
+      }
+
+      return res.status(200).send('/* CSS loaded via module */\n');
+    }
+
+    next();
+  });
+
+  if (!isProduction) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true, hmr: false },
       appType: 'spa',
     });
+    app.use((req, res, next) => {
+      if (req.path === '/' || req.path.endsWith('.html')) {
+        res.setHeader(
+          'Cache-Control',
+          'no-store, no-cache, must-revalidate, proxy-revalidate'
+        );
+      }
+      next();
+    });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(__dirname, 'dist');
-    app.use(express.static(distPath));
-    app.get('*all', (_req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.use(
+      express.static(distPath, {
+        index: false,
+        setHeaders: (res, filePath) => {
+          if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
+            res.setHeader(
+              'Content-Type',
+              'application/javascript; charset=utf-8'
+            );
+          } else if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
+          } else if (filePath.endsWith('.html')) {
+            res.setHeader(
+              'Cache-Control',
+              'no-store, no-cache, must-revalidate, proxy-revalidate'
+            );
+          }
+        },
+      })
+    );
+
+    app.get('*all', (req, res) => {
+      // Never return text/html for missing script/style files
+      if (/\.(js|mjs|cjs|wasm|css|map)$/i.test(req.path)) {
+        return res.status(404).end();
+      }
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.sendFile(distIndexPath);
     });
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`PixelBoof server running on http://0.0.0.0:${PORT}`);
+    console.log(
+      `PixelBoof server running on http://0.0.0.0:${PORT} (${isProduction ? 'production' : 'development'})`
+    );
   });
 }
 
