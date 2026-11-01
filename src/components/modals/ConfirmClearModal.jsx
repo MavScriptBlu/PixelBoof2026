@@ -16,6 +16,9 @@ export default function ConfirmClearModal({
   const stickerQueue = useStore.useStickerQueue()
   const stickerQueueDownloading = useStore.useStickerQueueDownloading()
 
+  const attendeeName = useStore.useAttendeeName()
+  const attendeeSchool = useStore.useAttendeeSchool()
+
   const {
     closeConfirmModal,
     confirmResetStationForNextAttendee,
@@ -36,6 +39,19 @@ export default function ConfirmClearModal({
 
   const targetPhotoSrc =
     photoId && (imageData.outputs[photoId] || imageData.inputs[photoId])
+
+  const handleDownloadBatchFromConfirm = () => {
+    if (!attendeeName.trim() || !attendeeSchool.trim()) {
+      closeConfirmModal()
+      if (onOpenStickerQueue) onOpenStickerQueue()
+      showToast(
+        'Enter your Full Name & High School in the Sticker Queue to unlock Download!',
+        'error'
+      )
+      return
+    }
+    downloadStickerQueue()
+  }
 
   const handleDownloadSingleBeforeDelete = () => {
     if (!targetPhotoSrc || !photoId) return
@@ -174,7 +190,7 @@ export default function ConfirmClearModal({
                 <button
                   type="button"
                   disabled={stickerQueueDownloading}
-                  onClick={downloadStickerQueue}
+                  onClick={handleDownloadBatchFromConfirm}
                   className="pixel-btn text-[8px] px-3 py-2 min-h-[40px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex-1 justify-center"
                 >
                   <PixelIcon name="download" size={12} />

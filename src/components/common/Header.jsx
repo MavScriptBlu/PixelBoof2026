@@ -11,12 +11,15 @@ export default function Header({onOpenStickerQueue}) {
   const photos = useStore.usePhotos()
   const stickerQueue = useStore.useStickerQueue()
   const stickerQueueDownloading = useStore.useStickerQueueDownloading()
+  const attendeeName = useStore.useAttendeeName()
+  const attendeeSchool = useStore.useAttendeeSchool()
   const soundEnabled = useStore.useSoundEnabled()
   const {
     setView,
     downloadStickerQueue,
     resetStationForNextAttendee,
-    toggleSound
+    toggleSound,
+    showToast
   } = useStore.getState()
 
   const qLen = stickerQueue.length
@@ -24,6 +27,18 @@ export default function Header({onOpenStickerQueue}) {
 
   const handleToggleView = () => {
     setView(isCameraView ? 'gallery' : 'camera')
+  }
+
+  const handleHeaderDownloadBatch = () => {
+    if (!attendeeName.trim() || !attendeeSchool.trim()) {
+      if (onOpenStickerQueue) onOpenStickerQueue()
+      showToast(
+        'Enter your Full Name & High School in the Sticker Queue to unlock Download!',
+        'error'
+      )
+      return
+    }
+    downloadStickerQueue()
   }
 
   return (
@@ -68,7 +83,7 @@ export default function Header({onOpenStickerQueue}) {
             id="btn-download-batch-header"
             type="button"
             disabled={stickerQueueDownloading}
-            onClick={downloadStickerQueue}
+            onClick={handleHeaderDownloadBatch}
             className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-2.5 py-1.5 min-h-[38px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 flex items-center gap-1.5 whitespace-nowrap shrink-0"
             title="Download Batch: Save your queued stickers into a local ZIP file"
           >
@@ -118,7 +133,14 @@ export default function Header({onOpenStickerQueue}) {
             <PixelIcon name={isCameraView ? 'gallery' : 'camera'} size={13} />
           </span>
           <span id="view-toggle-text">
-            {isCameraView ? `GALLERY (${photos.length})` : 'BACK TO CAMERA'}
+            {isCameraView ? (
+              `GALLERY (${photos.length})`
+            ) : (
+              <>
+                <span className="sm:hidden">CAMERA</span>
+                <span className="hidden sm:inline">BACK TO CAMERA</span>
+              </>
+            )}
           </span>
         </button>
 

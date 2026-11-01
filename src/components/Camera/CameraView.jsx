@@ -327,12 +327,12 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
           >
             <div />
 
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => startVideo(facingMode)}
                 disabled={isInitializingCamera}
-                className="flex flex-col items-center justify-center gap-6 p-6 cursor-pointer group"
+                className="flex flex-col items-center justify-center gap-5 sm:gap-6 px-4 py-3 cursor-pointer group"
               >
                 <h1 className="pixel-font text-2xl sm:text-4xl md:text-5xl text-[#facc15] drop-shadow-[4px_4px_0_#9f1239] group-hover:scale-105 transition-transform">
                   PIXEL BOOF
@@ -348,6 +348,29 @@ export default function CameraView({onPhotoClick, onOpenChatHelper}) {
                   )}
                 </span>
               </button>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  id="btn-homepage-lens"
+                  type="button"
+                  onClick={() => setShowLensDrawer(true)}
+                  className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2 min-h-[40px] bg-[#151928] hover:bg-[#1e2538] text-[#facc15] border-[#475569] hover:border-[#facc15]"
+                  title="Choose a character lens or custom prompt"
+                >
+                  <PixelIcon name={curModeObj.icon || 'star'} size={12} />
+                  <span>LENS: {curModeObj.name}</span>
+                </button>
+                <button
+                  id="btn-homepage-upload"
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="pixel-btn text-[8px] sm:text-[9px] px-3 py-2 min-h-[40px] bg-[#151928] hover:bg-[#1e2538] text-sky-300 border-sky-400/70 hover:border-sky-300"
+                  title="Upload a photo from your device"
+                >
+                  <PixelIcon name="upload" size={12} />
+                  <span>UPLOAD PHOTO</span>
+                </button>
+              </div>
             </div>
 
             {/* Stylish Retro Pixel-Font Privacy Box (Strictly on the Homepage) */}

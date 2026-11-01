@@ -84,6 +84,8 @@ async function startServer() {
       );
 
       let response = null;
+      let imageUrl: string | null = null;
+      let AccompanyingText = '';
       let usedModel = model;
       let lastError: unknown = null;
 
@@ -94,7 +96,7 @@ async function startServer() {
             candidateModel.includes('3-pro-image') ||
             candidateModel.includes('3.1-flash-image');
 
-          response = await ai.models.generateContent({
+          const AttemptResponse = await ai.models.generateContent({
             model: candidateModel,
             contents: { parts },
             config: {
@@ -108,17 +110,41 @@ async function startServer() {
                   },
             },
           });
-          usedModel = candidateModel;
-          break;
+          AccompanyingText = '';
+          const candidateParts =
+            AttemptResponse.candidates?.[0]?.content?.parts || [];
+          for (const part of candidateParts) {
+            if (part.inlineData?.data) {
+              const outMime = part.inlineData.mimeType || 'image/png';
+              imageUrl = `data:${outMime};base64,${part.inlineData.data}`;
+            } else if (part.text) {
+              AccompanyingText += part.text;
+            }
+          }
+
+          if (imageUrl) {
+            response = AttemptResponse;
+            usedModel = candidateModel;
+            break;
+          }
+          lastError = new Error(
+            AccompanyingText ||
+              `Model "${candidateModel}" did not return image data.`
+          );
         } catch (err) {
           lastError = err;
           const msg = err instanceof Error ? err.message : String(err);
           const isModelNotFoundOrUnsupported =
             msg.includes('404') ||
+            msg.includes('400') ||
+            msg.includes('403') ||
             msg.includes('NOT_FOUND') ||
             msg.includes('not found') ||
             msg.includes('not supported') ||
-            msg.includes('Invalid argument');
+            msg.includes('Invalid argument') ||
+            msg.includes('INVALID_ARGUMENT') ||
+            msg.includes('PERMISSION_DENIED') ||
+            msg.includes('permission');
           if (!isModelNotFoundOrUnsupported) {
             throw err;
           }
@@ -128,30 +154,11 @@ async function startServer() {
         }
       }
 
-      if (!response) {
-        throw lastError || new Error('No available Gemini image generation model succeeded.');
-      }
-
-      const candidateParts = response.candidates?.[0]?.content?.parts || [];
-      let imageUrl = null;
-      let AccompanyingText = '';
-
-      for (const part of candidateParts) {
-        if (part.inlineData?.data) {
-          const outMime = part.inlineData.mimeType || 'image/png';
-          imageUrl = `data:${outMime};base64,${part.inlineData.data}`;
-        } else if (part.text) {
-          AccompanyingText += part.text;
-        }
-      }
-
-      if (!imageUrl) {
-        return res.status(502).json({
-          error:
-            AccompanyingText ||
-            'No image data returned from Gemini model. Please try snapping again.',
-          fallbackRequired: false,
-        });
+      if (!response || !imageUrl) {
+        throw (
+          lastError ||
+          new Error('No available Gemini image generation model succeeded.')
+        );
       }
 
       return res.json({
@@ -480,9 +487,15 @@ async function startServer() {
           const msg = err instanceof Error ? err.message : String(err);
           const isModelNotFound =
             msg.includes('404') ||
+            msg.includes('400') ||
+            msg.includes('403') ||
             msg.includes('NOT_FOUND') ||
             msg.includes('not found') ||
-            msg.includes('not supported');
+            msg.includes('not supported') ||
+            msg.includes('Invalid argument') ||
+            msg.includes('INVALID_ARGUMENT') ||
+            msg.includes('PERMISSION_DENIED') ||
+            msg.includes('permission');
           if (!isModelNotFound) {
             throw err;
           }
@@ -512,7 +525,7 @@ async function startServer() {
   if (process.env.NODE_ENV !== 'production') {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'spa',
     });
     app.use(vite.middlewares);

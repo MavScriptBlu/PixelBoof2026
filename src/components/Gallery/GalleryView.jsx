@@ -11,16 +11,31 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
   const photos = useStore.usePhotos()
   const stickerQueue = useStore.useStickerQueue()
   const stickerQueueDownloading = useStore.useStickerQueueDownloading()
+  const attendeeName = useStore.useAttendeeName()
+  const attendeeSchool = useStore.useAttendeeSchool()
   const {
     resetStationForNextAttendee,
     downloadStickerQueue,
-    setView
+    setView,
+    showToast
   } = useStore.getState()
 
   const qLen = stickerQueue.length
   const readyPhotosCount = photos.filter(p => !p.isBusy).length
   const canDownloadBatch =
     !stickerQueueDownloading && (qLen > 0 || readyPhotosCount > 0)
+
+  const handleGalleryDownloadBatch = () => {
+    if (!attendeeName.trim() || !attendeeSchool.trim()) {
+      if (onShowStickerQueue) onShowStickerQueue()
+      showToast(
+        'Enter your Full Name & High School in the Sticker Queue to unlock Download!',
+        'error'
+      )
+      return
+    }
+    downloadStickerQueue()
+  }
 
   return (
     <div
@@ -54,7 +69,7 @@ export default function GalleryView({onPhotoClick, onShowStickerQueue}) {
             id="btn-download-batch-gallery"
             type="button"
             disabled={!canDownloadBatch}
-            onClick={downloadStickerQueue}
+            onClick={handleGalleryDownloadBatch}
             className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-3 py-2.5 min-h-[44px] bg-emerald-700 hover:bg-emerald-600 text-white border-emerald-300 justify-center"
             title="Download Batch: Aggregate your queued or captured stickers (up to 3) into a ZIP file"
           >
