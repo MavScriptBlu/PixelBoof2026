@@ -527,10 +527,10 @@ async function startServer() {
   const distAssetsPath = path.join(distPath, 'assets');
   const distIndexPath = path.join(distPath, 'index.html');
   const isDevCommand = process.env.npm_lifecycle_event === 'dev';
-  const wantsProduction =
-    !isDevCommand &&
-    (process.env.NODE_ENV === 'production' ||
-      process.env.npm_lifecycle_event === 'start');
+  if (!isDevCommand && !process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'production';
+  }
+  const wantsProduction = !isDevCommand;
 
   if (wantsProduction && !fs.existsSync(distIndexPath)) {
     try {
