@@ -10,6 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+bun.lock
+bun.lockb
 
 # Environment & Secrets (Never commit)
 .env
