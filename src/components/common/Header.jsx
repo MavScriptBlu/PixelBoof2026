@@ -3,10 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {useRef} from 'react'
 import {useStore, MAX_STICKERS} from '../../lib/store'
 import {MstcBadge, PixelIcon} from './PixelUI'
 
-export default function Header({onOpenStickerQueue}) {
+export default function Header({onOpenStickerQueue, onOpenStationHub}) {
+  const isOrganizerUnlocked = useStore.useIsOrganizerUnlocked()
   const currentView = useStore.useCurrentView()
   const photos = useStore.usePhotos()
   const stickerQueue = useStore.useStickerQueue()
@@ -24,6 +26,25 @@ export default function Header({onOpenStickerQueue}) {
 
   const qLen = stickerQueue.length
   const isCameraView = currentView === 'camera'
+
+  const logoClicksRef = useRef(0)
+  const logoTimerRef = useRef(null)
+
+  const handleLogoClick = () => {
+    setView('camera')
+    logoClicksRef.current += 1
+    if (logoTimerRef.current) clearTimeout(logoTimerRef.current)
+    if (logoClicksRef.current >= 3) {
+      logoClicksRef.current = 0
+      if (onOpenStationHub) {
+        onOpenStationHub('cloud')
+      }
+    } else {
+      logoTimerRef.current = setTimeout(() => {
+        logoClicksRef.current = 0
+      }, 1200)
+    }
+  }
 
   const handleToggleView = () => {
     setView(isCameraView ? 'gallery' : 'camera')
@@ -50,9 +71,9 @@ export default function Header({onOpenStickerQueue}) {
     >
       <button
         type="button"
-        onClick={() => setView('camera')}
+        onClick={handleLogoClick}
         className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 cursor-pointer text-left group"
-        title="Return to Camera View"
+        title="Return to Camera View (Triple-click for Organizer Hub)"
       >
         <MstcBadge />
         <h1 className="pixel-font text-[9px] sm:text-sm md:text-base text-[#facc15] drop-shadow-[2px_2px_0_#07090f] truncate group-hover:text-amber-200 transition-colors leading-none">
@@ -112,6 +133,21 @@ export default function Header({onOpenStickerQueue}) {
             {qLen}/{MAX_STICKERS}
           </span>
         </button>
+
+        {/* Organizer Station Hub Button (Admin Only: completely hidden from attendees until unlocked with password 2165) */}
+        {onOpenStationHub && isOrganizerUnlocked && (
+          <button
+            id="btn-open-qr-modal"
+            type="button"
+            onClick={() => onOpenStationHub('cloud')}
+            className="pixel-btn text-[8px] sm:text-[9px] px-2 sm:px-2.5 py-1.5 min-h-[38px] bg-[#151928] text-[#facc15] border-[#facc15] flex items-center gap-1.5 whitespace-nowrap shrink-0"
+            title="Organizer Station Hub & Playbook (Admin Only)"
+          >
+            <PixelIcon name="qr" size={13} />
+            <span className="hidden md:inline">STATION HUB</span>
+            <span className="md:hidden">HUB</span>
+          </button>
+        )}
 
         {/* Camera / Gallery View Toggle */}
         <button

@@ -467,9 +467,19 @@ export default limitFunction(
     }
 
     try {
+      const authPass =
+        typeof window !== 'undefined'
+          ? (sessionStorage.getItem('pixelBoofOrganizerUnlocked') === 'true'
+              ? 'MSTC26'
+              : sessionStorage.getItem('pixelBoofPasscode') || '')
+          : ''
+
       const response = await fetch('/api/generate-sticker', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authPass ? {'x-booth-pass': authPass} : {})
+        },
         body: JSON.stringify({
           model,
           prompt,

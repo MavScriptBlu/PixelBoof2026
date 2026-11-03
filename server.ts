@@ -24,6 +24,26 @@ async function startServer() {
   // Create or edit images (locked to 1K resolution to protect event budget)
   app.post('/api/generate-sticker', async (req, res) => {
     try {
+      if (process.env.BOOTH_LOCKED === 'true') {
+        const passHeader = String(
+          req.headers['x-booth-pass'] ||
+            req.headers['authorization'] ||
+            req.body?.passcode ||
+            ''
+        ).toUpperCase();
+        const hasOrganizerPass = ['MSTC26', 'TECHCON26', 'PIXELBOOF'].some(
+          p => passHeader.includes(p)
+        );
+
+        if (!hasOrganizerPass) {
+          return res.status(403).json({
+            error:
+              'PixelBoof is currently closed outside live Tech-Con event hours.',
+            fallbackRequired: false,
+          });
+        }
+      }
+
       const {
         prompt,
         inputFile,
@@ -656,6 +676,61 @@ async function startServer() {
         },
       })
     );
+
+    // Explicitly handle QR shortcut paths with optional route-specific kill switch
+    app.get(['/mstc26', '/techcon26'], (req, res) => {
+      const isEventClosed =
+        process.env.EVENT_CLOSED === 'true' ||
+        process.env.MSTC26_CLOSED === 'true';
+
+      if (isEventClosed) {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return res.status(410).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelBoof — Tech-Con 2026 Concluded</title>
+  <style>
+    body { background: #0b0e17; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; box-sizing: border-box; text-align: center; }
+    .card { background: #151928; border: 3px solid #9f1239; border-radius: 12px; max-width: 460px; padding: 32px 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .badge { display: inline-block; background: #8B1E41; color: #ffcc00; font-family: monospace; font-size: 11px; font-weight: bold; padding: 4px 12px; border-radius: 4px; margin-bottom: 16px; letter-spacing: 1px; }
+    h1 { margin: 0 0 12px; font-size: 20px; color: #facc15; font-weight: 800; }
+    p { margin: 0 0 14px; font-size: 13px; color: #cbd5e1; line-height: 1.6; }
+    .footer { font-size: 11px; color: #64748b; margin-top: 24px; border-top: 1px solid #334155; padding-top: 14px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="badge">MID-STATE TECH-CON 2026</div>
+    <h1>EVENT STATION CONCLUDED</h1>
+    <p>Thanks for visiting the <strong>PixelBoof AI Sticker Arcade</strong> at Mid-State Technical College!</p>
+    <p>The public event queue and on-site Cricut printing station are now closed.</p>
+    <div class="footer">Mid-State Technical College IT Department &bull; PixelBoof</div>
+  </div>
+</body>
+</html>`);
+      }
+
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.sendFile(distIndexPath);
+    });
+
+    app.get('/guide', (req, res) => {
+      res.setHeader(
+        'Cache-Control',
+        'no-store, no-cache, must-revalidate, proxy-revalidate'
+      );
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.sendFile(distIndexPath);
+    });
 
     app.get('*all', (req, res) => {
       // Never return text/html for missing script/style files

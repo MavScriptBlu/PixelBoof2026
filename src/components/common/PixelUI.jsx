@@ -362,6 +362,79 @@ export function PixelIcon({name = 'star', size = 14, className = ''}) {
             <rect x="6" y="12" width="6" height="2" fill="currentColor" />
           </>
         )
+      case 'qr':
+      case 'phone':
+        return (
+          <>
+            <rect x="1" y="1" width="6" height="6" fill="currentColor" />
+            <rect x="2" y="2" width="4" height="4" fill="#0b0e17" />
+            <rect x="3" y="3" width="2" height="2" fill="currentColor" />
+            <rect x="9" y="1" width="6" height="6" fill="currentColor" />
+            <rect x="10" y="2" width="4" height="4" fill="#0b0e17" />
+            <rect x="11" y="3" width="2" height="2" fill="currentColor" />
+            <rect x="1" y="9" width="6" height="6" fill="currentColor" />
+            <rect x="2" y="10" width="4" height="4" fill="#0b0e17" />
+            <rect x="3" y="11" width="2" height="2" fill="currentColor" />
+            <rect x="9" y="9" width="2" height="2" fill="currentColor" />
+            <rect x="13" y="9" width="2" height="2" fill="currentColor" />
+            <rect x="11" y="11" width="2" height="2" fill="currentColor" />
+            <rect x="9" y="13" width="2" height="2" fill="currentColor" />
+            <rect x="13" y="13" width="2" height="2" fill="currentColor" />
+          </>
+        )
+      case 'guide':
+      case 'clipboard':
+        return (
+          <>
+            <rect x="5" y="1" width="6" height="2" fill="currentColor" />
+            <rect x="2" y="2" width="12" height="13" fill="currentColor" />
+            <rect x="4" y="4" width="8" height="9" fill="#0b0e17" />
+            <rect x="5" y="6" width="6" height="1" fill="currentColor" />
+            <rect x="5" y="8" width="6" height="1" fill="currentColor" />
+            <rect x="5" y="10" width="4" height="1" fill="currentColor" />
+          </>
+        )
+      case 'lock':
+        return (
+          <>
+            <rect x="5" y="2" width="6" height="2" fill="currentColor" />
+            <rect x="4" y="4" width="2" height="3" fill="currentColor" />
+            <rect x="10" y="4" width="2" height="3" fill="currentColor" />
+            <rect x="2" y="7" width="12" height="8" fill="currentColor" />
+            <rect x="7" y="9" width="2" height="3" fill="#0b0e17" />
+          </>
+        )
+      case 'unlock':
+        return (
+          <>
+            <rect x="5" y="1" width="6" height="2" fill="currentColor" />
+            <rect x="10" y="3" width="2" height="4" fill="currentColor" />
+            <rect x="2" y="7" width="12" height="8" fill="currentColor" />
+            <rect x="7" y="9" width="2" height="3" fill="#0b0e17" />
+          </>
+        )
+      case 'print':
+        return (
+          <>
+            <rect x="4" y="1" width="8" height="3" fill="currentColor" />
+            <rect x="1" y="4" width="14" height="7" fill="currentColor" />
+            <rect x="11" y="6" width="2" height="2" fill="#0b0e17" />
+            <rect x="4" y="9" width="8" height="6" fill="currentColor" />
+            <rect x="5" y="10" width="6" height="4" fill="#0b0e17" />
+          </>
+        )
+      case 'terminal':
+      case 'code':
+        return (
+          <>
+            <rect x="1" y="2" width="14" height="12" fill="currentColor" />
+            <rect x="3" y="4" width="10" height="8" fill="#0b0e17" />
+            <rect x="4" y="5" width="2" height="2" fill="currentColor" />
+            <rect x="6" y="7" width="2" height="2" fill="currentColor" />
+            <rect x="4" y="9" width="2" height="2" fill="currentColor" />
+            <rect x="8" y="9" width="4" height="2" fill="currentColor" />
+          </>
+        )
       case 'star':
       default:
         return (

@@ -79,12 +79,19 @@ const useStoreBase = create(
     currentView: 'camera', // 'camera' | 'gallery'
     activeTopTab: 'app',
     isLockedSim: false,
+    boothQrUrl:
+      (typeof window !== 'undefined' &&
+        localStorage.getItem('pixelBoofQrUrl')) ||
+      'https://pixelboof.cloud.run/mstc26',
     zoom: 1,
     aspectRatio: '1:1',
     imageSize: '1K',
     showTutorial: false,
     showDisclaimer: false,
     showThemeModal: false,
+    isOrganizerUnlocked:
+      typeof window !== 'undefined' &&
+      sessionStorage.getItem('pixelBoofOrganizerUnlocked') === 'true',
     stickerQueue: [],
     stickerQueueDownloading: false,
     emailSending: false,
@@ -117,7 +124,68 @@ const useStoreBase = create(
       if (get().didInit) {
         return
       }
-      set({didInit: true})
+      let shouldLock = false
+      if (typeof window !== 'undefined') {
+        const pathLower = (window.location.pathname || '').toLowerCase()
+        const hostLower = (window.location.hostname || '').toLowerCase()
+        const hashLower = (window.location.hash || '').toLowerCase()
+        const params = new URLSearchParams(window.location.search)
+        const passParam = (
+          params.get('pass') ||
+          params.get('code') ||
+          ''
+        )
+          .trim()
+          .toUpperCase()
+
+        const refLower = (document.referrer || '').toLowerCase()
+        const hasUrlPass =
+          pathLower.includes('/mstc26') ||
+          pathLower.includes('/techcon26') ||
+          hashLower.includes('mstc26') ||
+          hashLower.includes('techcon26') ||
+          hostLower.includes('mavscript.blue') ||
+          refLower.includes('mavscript.blue') ||
+          refLower.includes('short.io') ||
+          ['2165', 'MSTC26', 'TECHCON26', 'PIXELBOOF'].includes(passParam)
+
+        if (hasUrlPass) {
+          sessionStorage.setItem('pixelBoofUnlocked', 'true')
+          if (passParam === '2165') {
+            sessionStorage.setItem('pixelBoofOrganizerUnlocked', 'true')
+            set({isOrganizerUnlocked: true})
+          }
+        }
+
+        const alreadyUnlocked =
+          sessionStorage.getItem('pixelBoofUnlocked') === 'true'
+        const envRequiresPass =
+          import.meta.env.VITE_BOOTH_LOCKED === 'true' ||
+          import.meta.env.VITE_REQUIRE_EVENT_PASS === 'true'
+
+        const startHour = Number(import.meta.env.VITE_EVENT_START_HOUR)
+        const endHour = Number(import.meta.env.VITE_EVENT_END_HOUR)
+        const hasHourGate =
+          !Number.isNaN(startHour) &&
+          !Number.isNaN(endHour) &&
+          import.meta.env.VITE_EVENT_START_HOUR !== undefined &&
+          import.meta.env.VITE_EVENT_START_HOUR !== ''
+
+        if (hasHourGate) {
+          const currentHour = new Date().getHours()
+          if (
+            (currentHour < startHour || currentHour >= endHour) &&
+            !alreadyUnlocked
+          ) {
+            shouldLock = true
+          }
+        }
+
+        if (envRequiresPass && !alreadyUnlocked) {
+          shouldLock = true
+        }
+      }
+      set({didInit: true, isLockedSim: shouldLock})
     },
 
     checkTutorial: () => {
@@ -533,6 +601,51 @@ const useStoreBase = create(
     setView: view => set({currentView: view}),
     setActiveTopTab: tab => set({activeTopTab: tab}),
     setIsLockedSim: locked => set({isLockedSim: locked}),
+    setBoothQrUrl: url => {
+      const cleaned =
+        (url || '').trim() || 'https://pixelboof.cloud.run/mstc26'
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('pixelBoofQrUrl', cleaned)
+      }
+      set({boothQrUrl: cleaned})
+    },
+    unlockBoothWithPasscode: rawPass => {
+      const cleaned = (rawPass || '').trim().toUpperCase()
+      if (['2165', 'MSTC26', 'TECHCON26', 'PIXELBOOF'].includes(cleaned)) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('pixelBoofUnlocked', 'true')
+          sessionStorage.setItem('pixelBoofPasscode', cleaned)
+        }
+        set({isLockedSim: false})
+        playSuccessSound()
+        get().showToast(`Passcode accepted! Booth unlocked.`)
+        return true
+      }
+      get().showToast('Invalid passcode! Try MSTC26 or TECHCON26.', 'error')
+      return false
+    },
+    unlockOrganizerWithPin: rawPin => {
+      const cleaned = (rawPin || '').trim().toUpperCase()
+      if (['2165', 'MSTC26', 'TECHCON26', 'PIXELBOOF'].includes(cleaned)) {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('pixelBoofOrganizerUnlocked', 'true')
+          sessionStorage.setItem('pixelBoofPasscode', cleaned)
+        }
+        set({isOrganizerUnlocked: true})
+        playSuccessSound()
+        get().showToast('Admin access granted! Station Hub unlocked.')
+        return true
+      }
+      get().showToast('Invalid Admin Password! Please try again.', 'error')
+      return false
+    },
+    lockOrganizer: () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('pixelBoofOrganizerUnlocked')
+      }
+      set({isOrganizerUnlocked: false})
+      get().showToast('Organizer access locked.')
+    },
     setShowThemeModal: show => set({showThemeModal: show}),
     setZoom: zoom => set({zoom}),
     setErrorMessage: message => {

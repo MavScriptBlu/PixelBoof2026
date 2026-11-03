@@ -25,6 +25,7 @@
     "lodash.shuffle": "latest",
     "nodemailer": "^10.2.1",
     "p-limit": "latest",
+    "qrcode": "^1.5.4",
     "react": "latest",
     "react-dom": "latest",
     "tailwindcss": "^4.3.3",
