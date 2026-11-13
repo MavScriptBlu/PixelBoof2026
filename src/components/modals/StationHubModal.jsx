@@ -64,34 +64,34 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
   <!-- PAGE 1: STUDENT-FACING STATION POSTER -->
   <div class="print-page bg-white max-w-[8.5in] mx-auto mb-8 p-6 sm:p-10 shadow-xl border-t-[10px] border-[#8B1E41] flex flex-col justify-between">
     <div>
-      <div class="bg-[#140f1d] border-2 border-[#8B1E41] p-5 rounded-lg text-white mb-5">
-        <div class="flex justify-between items-center border-b border-amber-500/40 pb-2 mb-3">
+      <div class="bg-[#140f1d] border-2 border-[#8B1E41] p-4 rounded-lg text-white mb-3">
+        <div class="flex justify-between items-center border-b border-amber-500/40 pb-1.5 mb-2">
           <span class="pixel-font text-[9px] text-[#ffcc00]">MID-STATE TECH-CON // AI BOOTH</span>
           <span class="pixel-font text-[9px] text-cyan-400">LIMIT: 3 STICKERS / PERSON</span>
         </div>
         <h2 class="font-black text-2xl sm:text-3xl tracking-tight uppercase text-white mb-1">
           PIXEL BOOF: <span class="text-[#ffcc00]">AI STICKER ARCADE</span>
         </h2>
-        <p class="text-xs text-slate-300 font-semibold">
+        <p class="text-xs text-slate-300 font-semibold leading-snug">
           Step up to the live webcam, transform into 40+ retro game heroes, fursonas, or collector cards, and get up to 3 real die-cut vinyl stickers crafted right here on our Cricut Joy Xtra!
         </p>
       </div>
 
       <!-- LEVEL 1 -->
-      <div class="mb-4 border-2 border-slate-200 rounded-lg p-4 bg-slate-50">
-        <div class="flex items-center mb-2">
+      <div class="mb-2.5 border-2 border-slate-200 rounded-lg p-3 bg-slate-50">
+        <div class="flex items-center mb-1.5">
           <span class="pixel-font text-[10px] bg-[#8B1E41] text-white px-2.5 py-1 rounded">LEVEL 1: STEP UP OR SCAN QR</span>
         </div>
-        <div class="flex flex-col sm:flex-row items-center gap-4">
-          <div class="bg-[#031019] p-2.5 rounded border-2 border-[#1f6f78] shrink-0" style="width: 132px;">
+        <div class="flex flex-col sm:flex-row items-center gap-3.5">
+          <div class="bg-[#031019] p-2 rounded border-2 border-[#1f6f78] shrink-0" style="width: 124px;">
             ${qrSvg}
           </div>
           <div class="flex-1 w-full">
-            <p class="text-xs sm:text-sm font-medium text-slate-800 mb-2">
+            <p class="text-xs sm:text-sm font-medium text-slate-800 mb-1.5 leading-snug">
               Use the open browser at this station computer, or scan the <strong>PixelBoof QR Code</strong> to run PixelBoof on your phone during Tech-Con hours:
             </p>
-            <div class="bg-[#140f1d] border-2 border-cyan-500 rounded p-3 text-center">
-              <p class="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mb-1">LIVE BOOTH URL (ACTIVE DURING TECH-CON HOURS ONLY):</p>
+            <div class="bg-[#140f1d] border-2 border-cyan-500 rounded p-2.5 text-center">
+              <p class="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mb-0.5">LIVE BOOTH URL (ACTIVE DURING TECH-CON HOURS ONLY):</p>
               <p class="pixel-font text-xs sm:text-sm text-[#ffcc00] tracking-wide select-all break-all">${qrUrl}</p>
               <p class="text-[11px] text-slate-300 mt-1">Booth Passcode (if prompted): <strong class="text-cyan-300">MSTC26</strong> or <strong class="text-cyan-300">TECHCON26</strong></p>
             </div>
@@ -100,34 +100,34 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
       </div>
 
       <!-- LEVEL 2 -->
-      <div class="mb-4 border-2 border-slate-200 rounded-lg p-4 bg-slate-50">
-        <div class="flex items-center mb-2">
+      <div class="mb-2.5 border-2 border-slate-200 rounded-lg p-3 bg-slate-50">
+        <div class="flex items-center mb-1.5">
           <span class="pixel-font text-[10px] bg-[#8B1E41] text-white px-2.5 py-1 rounded">LEVEL 2: PICK A LENS GROUP &amp; SNAP</span>
         </div>
-        <p class="text-xs sm:text-sm font-medium text-slate-800">
+        <p class="text-xs sm:text-sm font-medium text-slate-800 leading-snug">
           Click <strong>PRESS START</strong>, open the <strong>LENS</strong> drawer to pick from <strong>6 grouped category decks</strong> (<em>Arcade &amp; Platform, RPG &amp; Fantasy, Action &amp; Sci-Fi, Fursona, Cards &amp; Toons, or Pride &amp; Duos</em>)—or choose <strong>Custom Prompt</strong> to type your own idea! Hit the round <strong>Camera Shutter</strong> button and watch the bottom tray shimmer while Gemini AI builds your transparent die-cut sticker.
         </p>
       </div>
 
       <!-- LEVEL 3 -->
-      <div class="mb-4 border-2 border-[#8B1E41] rounded-lg p-4 bg-rose-50/60">
-        <div class="flex items-center mb-2">
+      <div class="mb-2.5 border-2 border-[#8B1E41] rounded-lg p-3 bg-rose-50/60">
+        <div class="flex items-center mb-1.5">
           <span class="pixel-font text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">LEVEL 3: QUEUE YOUR TOP 3 (MAX 3 STICKERS!)</span>
         </div>
-        <p class="text-xs sm:text-sm font-semibold text-slate-900 mb-2">
+        <p class="text-xs sm:text-sm font-semibold text-slate-900 mb-1.5 leading-snug">
           Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required to unlock <strong>Send to Shared Drive</strong>):
         </p>
-        <div class="bg-slate-900 text-amber-300 font-mono text-xs p-2.5 rounded">
+        <div class="bg-slate-900 text-amber-300 font-mono text-xs p-2 rounded">
           Auto-Named Batch Format: Alex_Rivera-SPASH_PixelBoof_3stickers.zip
         </div>
-        <p class="text-xs text-slate-700 font-medium mt-1.5">
+        <p class="text-xs text-slate-700 font-medium mt-1 leading-snug">
           *Why a 3-sticker limit? Every sticker is custom printed and cut on-site with our Cricut Joy Xtra—keeping it to 3 per person makes sure everyone gets their stickers before the buses leave!
         </p>
       </div>
 
       <!-- LEVEL 4 -->
-      <div class="bg-[#140f1d] border-2 border-[#8B1E41] p-4 rounded-lg text-white">
-        <div class="flex items-center mb-2">
+      <div class="bg-[#140f1d] border-2 border-[#8B1E41] p-3 rounded-lg text-white">
+        <div class="flex items-center mb-1.5">
           <span class="pixel-font text-[10px] text-[#ffcc00]">LEVEL 4: SEND TO SHARED DRIVE &amp; ON-SITE CRICUT LOOT</span>
         </div>
         <p class="text-xs sm:text-sm text-slate-200 leading-snug mb-1">
@@ -139,7 +139,7 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
       </div>
     </div>
 
-    <div class="pt-3 mt-4 border-t border-slate-200 flex justify-between items-center text-xs">
+    <div class="pt-2 mt-2.5 border-t border-slate-200 flex justify-between items-center text-xs">
       <span class="font-extrabold text-[#8B1E41]">Mid-State Technical College // IT Department</span>
       <span class="font-semibold text-slate-700">PixelBoof AI Booth</span>
       <span class="font-black text-[#8B1E41]">ATTENDEE GUIDE — PAGE 1</span>
@@ -380,8 +380,8 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
       <div className="print-page bg-white max-w-[8.5in] mx-auto mb-6 p-5 sm:p-8 shadow-xl border-t-[10px] border-[#8B1E41] flex flex-col justify-between text-slate-900">
         <div>
           {/* Header Banner */}
-          <div className="bg-[#140f1d] border-2 border-[#8B1E41] p-4 sm:p-5 rounded-lg text-white mb-4">
-            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-amber-500/40 pb-2 mb-3">
+          <div className="bg-[#140f1d] border-2 border-[#8B1E41] p-3.5 sm:p-4 rounded-lg text-white mb-3">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-b border-amber-500/40 pb-1.5 mb-2">
               <span className="pixel-font text-[8px] sm:text-[9px] text-[#ffcc00]">
                 MID-STATE TECH-CON // AI BOOTH
               </span>
@@ -392,26 +392,26 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
             <h2 className="font-black text-xl sm:text-3xl tracking-tight uppercase text-white mb-1">
               PIXEL BOOF: <span className="text-[#ffcc00]">AI STICKER ARCADE</span>
             </h2>
-            <p className="text-xs text-slate-300 font-semibold leading-relaxed">
+            <p className="text-xs text-slate-300 font-semibold leading-snug">
               Step up to the live webcam, transform into 40+ retro game heroes, fursonas, or collector cards, and get up to 3 real die-cut vinyl stickers crafted right here on our Cricut Joy Xtra!
             </p>
           </div>
 
           {/* LEVEL 1 (With Scannable PixelBoof QR Code) */}
-          <div className="mb-3.5 border-2 border-slate-200 rounded-lg p-3.5 sm:p-4 bg-slate-50">
-            <div className="flex items-center mb-2">
+          <div className="mb-2.5 border-2 border-slate-200 rounded-lg p-3 bg-slate-50">
+            <div className="flex items-center mb-1.5">
               <span className="pixel-font text-[9px] sm:text-[10px] bg-[#8B1E41] text-white px-2.5 py-1 rounded">
                 LEVEL 1: STEP UP OR SCAN QR
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <PixelBoofQrCard url={qrUrl} size={114} includeTitle={true} />
+            <div className="flex flex-col sm:flex-row items-center gap-3.5">
+              <PixelBoofQrCard url={qrUrl} size={108} includeTitle={true} />
               <div className="flex-1 w-full">
-                <p className="text-xs sm:text-sm font-medium text-slate-800 mb-2">
+                <p className="text-xs sm:text-sm font-medium text-slate-800 mb-1.5 leading-snug">
                   Use the open browser at this station computer, or scan the <strong>PixelBoof QR Code</strong> to run PixelBoof on your phone during Tech-Con hours:
                 </p>
-                <div className="bg-[#140f1d] border-2 border-cyan-500 rounded p-2.5 sm:p-3 text-center">
-                  <p className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mb-1">
+                <div className="bg-[#140f1d] border-2 border-cyan-500 rounded p-2.5 text-center">
+                  <p className="text-[10px] uppercase tracking-widest text-cyan-400 font-bold mb-0.5">
                     LIVE BOOTH URL (ACTIVE DURING TECH-CON HOURS ONLY):
                   </p>
                   <p className="pixel-font text-[10px] sm:text-xs text-[#ffcc00] tracking-wide select-all break-all">
@@ -428,38 +428,38 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
           </div>
 
           {/* LEVEL 2 */}
-          <div className="mb-3.5 border-2 border-slate-200 rounded-lg p-3.5 sm:p-4 bg-slate-50">
-            <div className="flex items-center mb-2">
+          <div className="mb-2.5 border-2 border-slate-200 rounded-lg p-3 bg-slate-50">
+            <div className="flex items-center mb-1.5">
               <span className="pixel-font text-[9px] sm:text-[10px] bg-[#8B1E41] text-white px-2.5 py-1 rounded">
                 LEVEL 2: PICK A LENS GROUP &amp; SNAP
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-medium text-slate-800 leading-relaxed">
+            <p className="text-xs sm:text-sm font-medium text-slate-800 leading-snug">
               Click <strong>PRESS START</strong>, tap the <strong>LENS</strong> button to pick from <strong>6 grouped category decks</strong> (<em>Arcade &amp; Platform, RPG &amp; Fantasy, Action &amp; Sci-Fi, Fursona, Cards &amp; Toons, or Pride &amp; Duos</em>)—or choose <strong>Custom Prompt</strong> to type your own idea! Hit the round <strong>Camera Shutter</strong> button and watch the bottom tray shimmer while Gemini AI builds your transparent die-cut sticker.
             </p>
           </div>
 
           {/* LEVEL 3 */}
-          <div className="mb-3.5 border-2 border-[#8B1E41] rounded-lg p-3.5 sm:p-4 bg-rose-50/60">
-            <div className="flex items-center mb-2">
+          <div className="mb-2.5 border-2 border-[#8B1E41] rounded-lg p-3 bg-rose-50/60">
+            <div className="flex items-center mb-1.5">
               <span className="pixel-font text-[9px] sm:text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">
                 LEVEL 3: QUEUE YOUR TOP 3 (MAX 3 STICKERS!)
               </span>
             </div>
-            <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">
+            <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-1.5 leading-snug">
               Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong> to add your favorites to your <strong>Sticker Queue</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required to unlock <strong>Send to Shared Drive</strong>):
             </p>
-            <div className="bg-slate-900 text-amber-300 font-mono text-xs p-2.5 rounded">
+            <div className="bg-slate-900 text-amber-300 font-mono text-xs p-2 rounded">
               Auto-Named Batch Format: Alex_Rivera-SPASH_PixelBoof_3stickers.zip
             </div>
-            <p className="text-xs text-slate-700 font-medium mt-1.5">
+            <p className="text-xs text-slate-700 font-medium mt-1 leading-snug">
               *Why a 3-sticker limit? Every sticker is custom printed and cut on-site with our Cricut Joy Xtra—keeping it to 3 per person makes sure everyone gets their stickers before the buses leave!
             </p>
           </div>
 
           {/* LEVEL 4 */}
-          <div className="bg-[#140f1d] border-2 border-[#8B1E41] p-3.5 sm:p-4 rounded-lg text-white">
-            <div className="flex items-center mb-2">
+          <div className="bg-[#140f1d] border-2 border-[#8B1E41] p-3 rounded-lg text-white">
+            <div className="flex items-center mb-1.5">
               <span className="pixel-font text-[9px] sm:text-[10px] text-[#ffcc00]">
                 LEVEL 4: SEND TO SHARED DRIVE &amp; ON-SITE CRICUT LOOT
               </span>
@@ -473,7 +473,7 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
           </div>
         </div>
 
-        <div className="pt-3 mt-4 border-t border-slate-200 flex justify-between items-center text-xs">
+        <div className="pt-2 mt-2.5 border-t border-slate-200 flex justify-between items-center text-xs">
           <span className="font-extrabold text-[#8B1E41]">
             Mid-State Technical College // IT Department
           </span>
