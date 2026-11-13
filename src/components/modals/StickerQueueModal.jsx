@@ -70,8 +70,8 @@ export default function StickerQueueModal({onClose}) {
               </h2>
             </div>
             <p className="text-xs text-slate-300 mt-1">
-              Enter your Name &amp; High School (required) to send your transparent Cricut-ready 3-sticker ZIP to{' '}
-              <strong className="text-[#facc15]">{ORGANIZER_EMAIL}</strong> or{' '}
+              Enter your Name &amp; High School (required) and click{' '}
+              <strong className="text-[#facc15]">Send to Shared Drive</strong> to route your 3-sticker batch straight into the Cricut print folder (via {ORGANIZER_EMAIL}), or{' '}
               <strong>Download Batch</strong> on the Kiosk computer.
             </p>
           </div>
@@ -154,13 +154,14 @@ export default function StickerQueueModal({onClose}) {
           )}
         </div>
 
-        {/* Confirmation Banner when Gmail Send Succeeds */}
+        {/* Confirmation Banner when Shared Drive Send Succeeds */}
         {lastEmailResult && (
           <div className="bg-emerald-950/90 border border-emerald-400 px-3 py-2 mb-2.5 text-xs text-emerald-200 flex items-center gap-2 shrink-0">
             <PixelIcon name="check" size={13} className="text-emerald-400" />
             <span>
-              Auto-sent <strong>{lastEmailResult.fileName}</strong> directly to{' '}
-              <strong>{lastEmailResult.recipientEmail}</strong>!
+              Sent <strong>{lastEmailResult.fileName}</strong> to the{' '}
+              <strong>Shared Drive Cricut Queue</strong> (via{' '}
+              <strong>{lastEmailResult.recipientEmail}</strong>)!
             </span>
           </div>
         )}
@@ -249,16 +250,16 @@ export default function StickerQueueModal({onClose}) {
               title={
                 !hasAttendeeInfo
                   ? 'Fill in your Full Name and High School first'
-                  : `Automatically email ZIP batch directly to ${ORGANIZER_EMAIL}`
+                  : `Send sticker batch to the Shared Drive Cricut folder (via ${ORGANIZER_EMAIL})`
               }
             >
               <PixelIcon name="mail" size={13} />
               <span>
                 {emailSending && !stickerQueueDownloading
-                  ? 'SENDING TO GMAIL...'
+                  ? 'SENDING TO DRIVE...'
                   : !hasAttendeeInfo
                     ? 'ENTER NAME & SCHOOL TO SEND'
-                    : `SEND TO GMAIL (${ORGANIZER_EMAIL.split('@')[0]})`}
+                    : 'SEND TO SHARED DRIVE'}
               </span>
             </button>
 

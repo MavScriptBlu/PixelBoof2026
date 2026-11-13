@@ -32,7 +32,7 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PixelBoof — 2-Page Station &amp; Helper Guide (MSTC Tech-Con)</title>
+  <title>PixelBoof — 3-Page Station &amp; Helper Guide (MSTC Tech-Con)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -51,11 +51,11 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
 <body>
   <div class="max-w-[8.5in] mx-auto mb-5 bg-[#140f1d] text-white p-4 rounded-lg border-2 border-[#8B1E41] flex flex-wrap justify-between items-center gap-3 no-print shadow-lg">
     <div>
-      <p class="pixel-font text-[10px] text-[#ffcc00] mb-1">PIXEL BOOF — 2-PAGE STATION POSTER &amp; VOLUNTEER GUIDE</p>
-      <p class="text-xs text-slate-300">Page 1: Attendee Step-by-Step Guide (3-Sticker Limit &amp; Event QR) | Page 2: Volunteer &amp; Helper Station Guide</p>
+      <p class="pixel-font text-[10px] text-[#ffcc00] mb-1">PIXEL BOOF — 3-PAGE STATION POSTER, HELPER &amp; ORGANIZER GUIDE</p>
+      <p class="text-xs text-slate-300">Page 1: Attendee Step-by-Step | Page 2: Volunteer Playbook | Page 3: Organizer Private Guide (Blu)</p>
     </div>
     <button onclick="window.print()" class="bg-[#8B1E41] hover:bg-[#6e1633] text-[#ffcc00] border border-[#ffcc00] text-xs font-bold py-2 px-4 rounded shadow cursor-pointer">
-      Print / Save 2-Page PDF
+      Print / Save 3-Page PDF
     </button>
   </div>
 
@@ -113,7 +113,7 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
           <span class="pixel-font text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">LEVEL 3: QUEUE YOUR TOP 3 (MAX 3 STICKERS!)</span>
         </div>
         <p class="text-xs sm:text-sm font-semibold text-slate-900 mb-2">
-          Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required to unlock Send/Download):
+          Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required to unlock <strong>Send to Shared Drive</strong>):
         </p>
         <div class="bg-slate-900 text-amber-300 font-mono text-xs p-2.5 rounded">
           Auto-Named Batch Format: Alex_Rivera-SPASH_PixelBoof_3stickers.zip
@@ -126,10 +126,10 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
       <!-- LEVEL 4 -->
       <div class="bg-[#140f1d] border-2 border-[#8B1E41] p-4 rounded-lg text-white">
         <div class="flex items-center mb-2">
-          <span class="pixel-font text-[10px] text-[#ffcc00]">LEVEL 4: HELPER HANDOFF &amp; ON-SITE CRICUT LOOT</span>
+          <span class="pixel-font text-[10px] text-[#ffcc00]">LEVEL 4: SEND TO SHARED DRIVE &amp; ON-SITE CRICUT LOOT</span>
         </div>
         <p class="text-xs sm:text-sm text-slate-200 leading-snug mb-1">
-          Click <strong>Send to Gmail (${ORGANIZER_EMAIL})</strong> or wave over an <strong>AI Booth Helper</strong> once your 3 stickers are queued! Our helpers batch-transfer your saved stickers so our Cricut operator can print and precision-cut them right at the booth.
+          Click <strong>Send to Shared Drive</strong> (or wave over an <strong>AI Booth Helper</strong>) once your 3 stickers are queued! Your batch automatically routes into our Google Drive Cricut folder so our operator can print and precision-cut them right at the booth.
         </p>
         <p class="text-xs text-cyan-300 font-bold">
           Submit your Sticker Queue at least 35 minutes before buses depart so your batch finishes cutting in time!
@@ -156,12 +156,12 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
           RUNNING THE <span class="text-cyan-400">PIXEL BOOF</span> STATION
         </h2>
         <p class="text-xs text-slate-300 font-semibold">
-          Our mission: Help attendees create their custom AI stickers, send/download their top 3 picks to the Cricut print queue, and keep the station moving smoothly!
+          Our mission: Help attendees create their custom AI stickers, click Send to Shared Drive so their top 3 picks auto-sync to the Cricut print folder, and keep the station moving smoothly!
         </p>
       </div>
 
       <h3 class="font-black text-sm uppercase text-[#8B1E41] mb-2">
-        1. Station Helper Loop (Station PCs &amp; Mobile &rarr; Gmail / Shared Drive)
+        1. Station Helper Loop (Auto Shared Drive Queue)
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
         <div class="border border-slate-300 rounded p-3 bg-slate-50">
@@ -171,15 +171,15 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
           </p>
         </div>
         <div class="border border-slate-300 rounded p-3 bg-slate-50">
-          <p class="font-bold text-xs text-slate-900 uppercase mb-1">Step B: Tag Name &amp; School + Send / Download Batch</p>
+          <p class="font-bold text-xs text-slate-900 uppercase mb-1">Step B: Tag Name &amp; School + Send to Shared Drive</p>
           <p class="text-xs text-slate-700 leading-relaxed">
-            Open <strong>Sticker Queue</strong>, verify both <strong>Full Name &amp; High School</strong> are filled in, and click <strong>Send to Gmail (${ORGANIZER_EMAIL})</strong> or <strong>Download Batch</strong> for a ready-to-sort ZIP!
+            Open <strong>Sticker Queue</strong>, verify both <strong>Full Name &amp; High School</strong> are filled in, and click <strong>Send to Shared Drive</strong>! It auto-routes via <strong>${ORGANIZER_EMAIL}</strong> and extracts PNGs straight into Blu&rsquo;s Cricut Google Drive folder.
           </p>
         </div>
         <div class="border-2 border-[#8B1E41] rounded p-3 bg-rose-50/40 sm:col-span-2">
-          <p class="font-extrabold text-xs text-[#8B1E41] uppercase mb-1">Step C: Transfer Batch &amp; Click &ldquo;Next Attendee&rdquo;</p>
+          <p class="font-extrabold text-xs text-[#8B1E41] uppercase mb-1">Step C: Confirm Delivery &amp; Click &ldquo;Next Attendee&rdquo;</p>
           <p class="text-xs text-slate-800 leading-relaxed">
-            Once the ZIP is emailed to <strong>${ORGANIZER_EMAIL}</strong> or dropped into the <strong>PixelBoof Shared Google Drive</strong> folder for the Cricut Joy Xtra, click <strong>Next Attendee</strong> and confirm to wipe the session back to <code>0/3</code> on the Homepage for the next student!
+            Once the green confirmation banner shows the batch was sent to the <strong>Shared Drive Cricut Queue</strong> (or if offline, saved via <strong>Download Batch</strong>), click <strong>Next Attendee</strong> and confirm to wipe the session back to <code>0/3</code> on the Homepage for the next student!
           </p>
         </div>
       </div>
@@ -201,7 +201,7 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
       </h3>
       <div class="border-l-4 border-[#8B1E41] bg-slate-100 p-3.5 rounded-r-lg text-xs text-slate-800 space-y-1.5">
         <p>
-          <strong class="text-slate-950">• Event-Time Mobile Access:</strong> Kids can scan the booth QR code (<code>${qrUrl}</code>) to run PixelBoof on their phones while in line and email their 3-sticker batch directly from the Sticker Queue modal.
+          <strong class="text-slate-950">• Event-Time Mobile Access:</strong> Kids can scan the booth QR code (<code>${qrUrl}</code>) to run PixelBoof on their phones while in line and click <strong>Send to Shared Drive</strong> directly from the Sticker Queue modal.
         </p>
         <p>
           <strong class="text-slate-950">• Post-Event Shutdown:</strong> When Tech-Con wraps, see <strong>Page 3</strong> for the 1-click Short.io toggle that dead-ends the attendee QR code while keeping your personal app alive!
@@ -211,7 +211,7 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
 
     <div class="pt-3 mt-4 border-t border-slate-200 flex justify-between items-center text-xs">
       <span class="font-extrabold text-[#8B1E41]">Mid-State Technical College // IT Department</span>
-      <span class="font-semibold text-slate-700">Gmail / Shared Drive &rarr; Cricut Joy Xtra</span>
+      <span class="font-semibold text-slate-700">Send to Shared Drive &rarr; Cricut Joy Xtra</span>
       <span class="font-black text-[#8B1E41]">HELPER PLAYBOOK — PAGE 2</span>
     </div>
   </div>
@@ -261,16 +261,16 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
         </div>
       </div>
 
-      <!-- 3. Cricut Joy Xtra & Gmail Ingestion -->
+      <!-- 3. Cricut Joy Xtra & Auto Shared Drive Pipeline -->
       <div class="mb-4 border-2 border-[#8B1E41] rounded-lg p-4 bg-rose-50/40">
         <div class="flex items-center mb-2">
-          <span class="pixel-font text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">3. CRICUT JOY XTRA BATCH INGESTION</span>
+          <span class="pixel-font text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">3. CRICUT JOY XTRA &amp; SHARED DRIVE PIPELINE</span>
         </div>
         <div class="space-y-1 text-xs text-slate-800">
-          <p><strong>• Email Destination:</strong> Attendee ZIP batches are sent to <strong>${ORGANIZER_EMAIL}</strong> with the naming format:<br>
-            <code class="bg-slate-900 text-amber-300 font-mono text-[10px] p-1 rounded inline-block mt-0.5">Alex_Rivera-SPASH_PixelBoof_3stickers.zip</code>
+          <p><strong>• Auto-Extract Pipeline:</strong> Clicking <strong>Send to Shared Drive</strong> emails the ZIP via <code>SMTP_PASS</code> to <strong>${ORGANIZER_EMAIL}</strong>, and your Google Apps Script automatically unzips the PNGs into your Drive folder (<code>10y1pNlqmNncGoZ9L-1FqL87e_z9QV47r</code>) every minute:<br>
+            <code class="bg-slate-900 text-amber-300 font-mono text-[10px] p-1 rounded inline-block mt-0.5">Alex_Rivera-SPASH_sticker_1.png</code>
           </p>
-          <p><strong>• Cricut Design Space Import:</strong> Open Design Space &rarr; <em>Upload Image</em> &rarr; select the extracted PNGs &rarr; choose <strong>Complex</strong> &rarr; select <strong>Print Then Cut</strong>. The white die-cut sticker border is already rendered into the PNG.</p>
+          <p><strong>• Cricut Design Space Import:</strong> Open Design Space &rarr; <em>Upload Image</em> &rarr; select the auto-extracted PNGs from your synced Google Drive folder &rarr; choose <strong>Complex</strong> &rarr; select <strong>Print Then Cut</strong>.</p>
           <p><strong>• Vinyl Sizing:</strong> Recommended size: <strong>2.5" to 3"</strong> wide on Cricut Printable Vinyl or Waterproof Sticker Paper for fast cutting and clean peeling.</p>
         </div>
       </div>
@@ -282,12 +282,12 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-800">
           <div class="bg-white border border-cyan-200 p-2 rounded">
-            <p class="font-bold text-slate-900">URL Passcode Bypasses:</p>
-            <p class="font-mono text-[11px] text-cyan-700">?pass=MSTC26 &bull; ?pass=TECHCON26</p>
+            <p class="font-bold text-slate-900">Admin Station Hub Unlock:</p>
+            <p class="font-mono text-[11px] text-cyan-700">Password: 2165 &bull; Triple-click logo or Shift+Alt+O</p>
           </div>
           <div class="bg-white border border-cyan-200 p-2 rounded">
-            <p class="font-bold text-slate-900">Organizer PIN (Lock Modal):</p>
-            <p class="font-mono text-[11px] text-cyan-700">MSTC26 or TECHCON26</p>
+            <p class="font-bold text-slate-900">Booth Passcodes &amp; URL Bypass:</p>
+            <p class="font-mono text-[11px] text-cyan-700">MSTC26 &bull; TECHCON26 &bull; ?pass=2165</p>
           </div>
         </div>
       </div>
@@ -438,7 +438,7 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
               </span>
             </div>
             <p className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">
-              Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong> to add your favorites to your <strong>Sticker Queue</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required):
+              Click any finished creation in the bottom tray (or <strong>Gallery</strong>) and click <strong>Save for Sticker (Max 3)</strong> to add your favorites to your <strong>Sticker Queue</strong>. Then open <strong>Sticker Queue</strong> and enter your <strong>Full Name &amp; High School</strong> (required to unlock <strong>Send to Shared Drive</strong>):
             </p>
             <div className="bg-slate-900 text-amber-300 font-mono text-xs p-2.5 rounded">
               Auto-Named Batch Format: Alex_Rivera-SPASH_PixelBoof_3stickers.zip
@@ -452,11 +452,11 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
           <div className="bg-[#140f1d] border-2 border-[#8B1E41] p-3.5 sm:p-4 rounded-lg text-white">
             <div className="flex items-center mb-2">
               <span className="pixel-font text-[9px] sm:text-[10px] text-[#ffcc00]">
-                LEVEL 4: HELPER HANDOFF &amp; ON-SITE CRICUT LOOT
+                LEVEL 4: SEND TO SHARED DRIVE &amp; ON-SITE CRICUT LOOT
               </span>
             </div>
             <p className="text-xs sm:text-sm text-slate-200 leading-snug mb-1">
-              Click <strong>Send to Gmail ({ORGANIZER_EMAIL})</strong> or wave over an <strong>AI Booth Helper</strong> once your 3 stickers are queued! Our helpers batch-transfer your saved stickers so our Cricut operator can print and precision-cut them right at the booth.
+              Click <strong>Send to Shared Drive</strong> (or wave over an <strong>AI Booth Helper</strong>) once your 3 stickers are queued! Your batch automatically routes into our Google Drive Cricut folder so our operator can print and precision-cut them right at the booth.
             </p>
             <p className="text-xs text-cyan-300 font-bold">
               Submit your Sticker Queue at least 35 minutes before buses depart so your batch finishes cutting in time!
@@ -489,12 +489,12 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
               RUNNING THE <span className="text-cyan-400">PIXEL BOOF</span> STATION
             </h2>
             <p className="text-xs text-slate-300 font-semibold">
-              Our mission: Help attendees create their custom AI stickers, batch-transfer their top 3 picks to the Cricut print queue, and keep the station running smoothly!
+              Our mission: Help attendees create their custom AI stickers, click Send to Shared Drive so their top 3 picks auto-sync to the Cricut print folder, and keep the station running smoothly!
             </p>
           </div>
 
           <h3 className="font-black text-sm uppercase text-[#8B1E41] mb-2">
-            1. Station Helper Loop (Station PCs &amp; Mobile &rarr; Gmail / Shared Drive)
+            1. Station Helper Loop (Auto Shared Drive Queue)
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div className="border border-slate-300 rounded p-3 bg-slate-50">
@@ -507,18 +507,18 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
             </div>
             <div className="border border-slate-300 rounded p-3 bg-slate-50">
               <p className="font-bold text-xs text-slate-900 uppercase mb-1">
-                Step B: Tag Name &amp; School + Send or Download Batch
+                Step B: Tag Name &amp; School + Send to Shared Drive
               </p>
               <p className="text-xs text-slate-700 leading-relaxed">
-                Open <strong>Sticker Queue</strong>, verify both <strong>Full Name &amp; High School</strong> are filled in, and click <strong>Send to Gmail ({ORGANIZER_EMAIL})</strong> or <strong>Download Batch (X/3)</strong> for a ready-to-sort ZIP!
+                Open <strong>Sticker Queue</strong>, verify both <strong>Full Name &amp; High School</strong> are filled in, and click <strong>Send to Shared Drive</strong>! It auto-routes via <strong>{ORGANIZER_EMAIL}</strong> and extracts PNGs straight into Blu&rsquo;s Cricut Google Drive folder.
               </p>
             </div>
             <div className="border-2 border-[#8B1E41] rounded p-3 bg-rose-50/40 sm:col-span-2">
               <p className="font-extrabold text-xs text-[#8B1E41] uppercase mb-1">
-                Step C: Upload Batch to Shared Drive &amp; Click &ldquo;Next Attendee&rdquo;
+                Step C: Confirm Delivery &amp; Click &ldquo;Next Attendee&rdquo;
               </p>
               <p className="text-xs text-slate-800 leading-relaxed">
-                Once the batch is sent to <strong>{ORGANIZER_EMAIL}</strong> or dropped into the <strong>PixelBoof Shared Google Drive</strong> folder for Blu on the Cricut station, click <strong>Next Attendee</strong> inside the Sticker Queue modal (or header) to reset the station back to <code>0/3</code> for the next student!
+                Once the green confirmation banner shows the batch was sent to the <strong>Shared Drive Cricut Queue</strong> (or if offline, saved via <strong>Download Batch</strong>), click <strong>Next Attendee</strong> inside the Sticker Queue modal (or header) to reset the station back to <code>0/3</code> for the next student!
               </p>
             </div>
           </div>
@@ -540,7 +540,7 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
           </h3>
           <div className="border-l-4 border-[#8B1E41] bg-slate-100 p-3.5 rounded-r-lg text-xs text-slate-800 space-y-1.5">
             <p>
-              <strong className="text-slate-950">• Event-Time Mobile Access:</strong> Kids can scan the booth QR code (<code>{qrUrl}</code>) to run PixelBoof on their phones while in line and send their 3-sticker ZIP batch directly from the Sticker Queue modal.
+              <strong className="text-slate-950">• Event-Time Mobile Access:</strong> Kids can scan the booth QR code (<code>{qrUrl}</code>) to run PixelBoof on their phones while in line and click <strong>Send to Shared Drive</strong> directly from the Sticker Queue modal.
             </p>
             <p>
               <strong className="text-slate-950">• Post-Event Shutdown:</strong> When Tech-Con wraps, see <strong>Page 3</strong> for the 1-click Short.io toggle that dead-ends the attendee QR code while keeping your personal app alive!
@@ -553,7 +553,7 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
             Mid-State Technical College // IT Department
           </span>
           <span className="font-semibold text-slate-700">
-            Gmail / Shared Drive &rarr; Cricut Joy Xtra
+            Send to Shared Drive &rarr; Cricut Joy Xtra
           </span>
           <span className="font-black text-[#8B1E41]">HELPER PLAYBOOK — PAGE 2</span>
         </div>
@@ -625,25 +625,25 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
             </div>
           </div>
 
-          {/* 3. Cricut Joy Xtra & Gmail Ingestion */}
+          {/* 3. Cricut Joy Xtra & Auto Shared Drive Pipeline */}
           <div className="mb-3.5 border-2 border-[#8B1E41] rounded-lg p-3.5 sm:p-4 bg-rose-50/40">
             <div className="flex items-center mb-2">
               <span className="pixel-font text-[9px] sm:text-[10px] bg-[#8B1E41] text-[#ffcc00] px-2.5 py-1 rounded">
-                3. CRICUT JOY XTRA BATCH INGESTION
+                3. CRICUT JOY XTRA &amp; SHARED DRIVE PIPELINE
               </span>
             </div>
             <div className="space-y-1 text-xs text-slate-800">
               <p>
-                <strong>• Email Destination:</strong> Attendee ZIP batches are sent to <strong>{ORGANIZER_EMAIL}</strong> with the naming format:<br />
+                <strong>• Auto-Extract Pipeline:</strong> Clicking <strong>Send to Shared Drive</strong> emails the ZIP via <code>SMTP_PASS</code> to <strong>{ORGANIZER_EMAIL}</strong>, and your Google Apps Script automatically unzips the PNGs into your Drive folder (<code>10y1pNlqmNncGoZ9L-1FqL87e_z9QV47r</code>) every minute:<br />
                 <code className="bg-slate-900 text-amber-300 font-mono text-[10px] p-1 rounded inline-block mt-0.5">
-                  Alex_Rivera-SPASH_PixelBoof_3stickers.zip
+                  Alex_Rivera-SPASH_sticker_1.png
                 </code>
               </p>
               <p>
-                <strong>• Cricut Design Space Import:</strong> Open Design Space &rarr; <em>Upload Image</em> &rarr; select the extracted PNGs &rarr; choose <strong>Complex</strong> &rarr; select <strong>Print Then Cut</strong>. The white die-cut sticker border is already rendered into the PNG.
+                <strong>• Cricut Design Space Import:</strong> Open Design Space &rarr; <em>Upload Image</em> &rarr; select the auto-extracted PNGs from your synced Google Drive folder &rarr; choose <strong>Complex</strong> &rarr; select <strong>Print Then Cut</strong>.
               </p>
               <p>
-                <strong>• Vinyl Sizing:</strong> Recommended size: <strong>2.5" to 3"</strong> wide on Cricut Printable Vinyl or Waterproof Sticker Paper for fast cutting and clean peeling.
+                <strong>• Vinyl Sizing:</strong> Recommended size: <strong>2.5&quot; to 3&quot;</strong> wide on Cricut Printable Vinyl or Waterproof Sticker Paper for fast cutting and clean peeling.
               </p>
             </div>
           </div>
@@ -657,12 +657,12 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-800">
               <div className="bg-white border border-cyan-200 p-2 rounded">
-                <p className="font-bold text-slate-900">URL Passcode Bypasses:</p>
-                <p className="font-mono text-[11px] text-cyan-700">?pass=MSTC26 &bull; ?pass=TECHCON26</p>
+                <p className="font-bold text-slate-900">Admin Station Hub Unlock:</p>
+                <p className="font-mono text-[11px] text-cyan-700">Password: 2165 &bull; Triple-click logo or Shift+Alt+O</p>
               </div>
               <div className="bg-white border border-cyan-200 p-2 rounded">
-                <p className="font-bold text-slate-900">Organizer PIN (Lock Modal):</p>
-                <p className="font-mono text-[11px] text-cyan-700">MSTC26 or TECHCON26</p>
+                <p className="font-bold text-slate-900">Booth Passcodes &amp; URL Bypass:</p>
+                <p className="font-mono text-[11px] text-cyan-700">MSTC26 &bull; TECHCON26 &bull; ?pass=2165</p>
               </div>
             </div>
           </div>
@@ -809,7 +809,7 @@ pause
               }`}
             >
               <PixelIcon name="guide" size={12} />
-              <span>2. 2-PAGE STATION GUIDE</span>
+              <span>2. 3-PAGE STATION GUIDE</span>
             </button>
 
             <PixelCloseButton
@@ -943,7 +943,7 @@ pause
                         className="pixel-btn text-[8px] px-3 py-2 min-h-[38px] bg-[#9f1239] hover:bg-[#be123c] text-[#facc15] border-[#facc15]"
                       >
                         <PixelIcon name="print" size={12} />
-                        <span>OPEN 2-PAGE PRINTABLE POSTER &amp; GUIDE</span>
+                        <span>OPEN 3-PAGE PRINTABLE POSTER &amp; GUIDE</span>
                       </button>
                     </div>
                   </div>

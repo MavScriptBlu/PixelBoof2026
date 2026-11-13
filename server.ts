@@ -224,7 +224,8 @@ async function startServer() {
         : zipBase64;
       const zipBuffer = Buffer.from(cleanBase64, 'base64');
 
-      const subject = `[PixelBoof Tech-Con] ${attendeeName} (${attendeeSchool}) — ${stickerCount} Sticker(s)`;
+      const batchTag = Date.now().toString(36).slice(-4).toUpperCase();
+      const subject = `[PixelBoof Tech-Con] ${attendeeName} (${attendeeSchool}) — ${stickerCount} Sticker(s) [#${batchTag}]`;
       const htmlBody = `
         <div style="font-family: monospace; background: #140f1d; color: #f7f7f7; padding: 20px; border: 3px solid #ffcc00;">
           <h2 style="color: #ffcc00; margin-top: 0;">PIXEL BOOF — ATTENDEE STICKER BATCH</h2>
@@ -232,8 +233,9 @@ async function startServer() {
           <p><strong>High School:</strong> ${attendeeSchool}</p>
           <p><strong>Queued Stickers:</strong> ${stickerCount} / 3</p>
           <p><strong>Attached File:</strong> <code>${fileName}</code></p>
+          <p><strong>Batch ID:</strong> <code>#${batchTag}</code></p>
           <hr style="border-color: #8B1E41;" />
-          <p style="font-size: 11px; color: #cbd5e1;">Sent statelessly in-memory from PixelBoof via Gmail. Zero images are stored on the server.</p>
+          <p style="font-size: 11px; color: #cbd5e1;">Sent statelessly in-memory from PixelBoof via Gmail SMTP for automatic Shared Drive extraction. Zero images are stored on the server.</p>
         </div>
       `;
 
@@ -302,8 +304,9 @@ async function startServer() {
         });
       }
 
-      // Path 2: Server-side Gmail SMTP if GMAIL_APP_PASSWORD (or SMTP_PASS) is configured in environment
-      const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
+      // Path 2: Server-side Gmail SMTP if SMTP_PASS (or GMAIL_APP_PASSWORD) is configured in environment
+      const rawGmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS || '';
+      const gmailPass = rawGmailPass.replace(/\s+/g, '');
       if (gmailPass) {
         const gmailUser =
           process.env.GMAIL_USER ||

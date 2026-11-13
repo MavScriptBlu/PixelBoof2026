@@ -857,12 +857,12 @@ const useStoreBase = create(
         if (downloadLocal && autoEmail) {
           playSuccessSound()
           get().showToast(
-            `Downloaded "${zipFileName}" & emailed via Gmail to ${ORGANIZER_EMAIL}!`
+            `Downloaded "${zipFileName}" & sent to Shared Drive Queue!`
           )
         } else if (autoEmail) {
           playSuccessSound()
           get().showToast(
-            `Emailed "${zipFileName}" (${targetIds.length} stickers) via Gmail to ${ORGANIZER_EMAIL}!`
+            `Sent "${zipFileName}" (${targetIds.length} stickers) to Shared Drive Queue!`
           )
         } else if (downloadLocal) {
           playSuccessSound()
