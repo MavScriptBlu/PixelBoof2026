@@ -79,10 +79,16 @@ const useStoreBase = create(
     currentView: 'camera', // 'camera' | 'gallery'
     activeTopTab: 'app',
     isLockedSim: false,
-    boothQrUrl:
-      (typeof window !== 'undefined' &&
-        localStorage.getItem('pixelBoofQrUrl')) ||
-      'https://pixelboof.cloud.run/mstc26',
+    boothQrUrl: (() => {
+      const defaultUrl = 'https://pixelboof.mavscript.blue/mstc26'
+      if (typeof window === 'undefined') return defaultUrl
+      const saved = localStorage.getItem('pixelBoofQrUrl')
+      if (!saved || saved === 'https://pixelboof.cloud.run/mstc26') {
+        localStorage.setItem('pixelBoofQrUrl', defaultUrl)
+        return defaultUrl
+      }
+      return saved
+    })(),
     zoom: 1,
     aspectRatio: '1:1',
     imageSize: '1K',
@@ -603,7 +609,7 @@ const useStoreBase = create(
     setIsLockedSim: locked => set({isLockedSim: locked}),
     setBoothQrUrl: url => {
       const cleaned =
-        (url || '').trim() || 'https://pixelboof.cloud.run/mstc26'
+        (url || '').trim() || 'https://pixelboof.mavscript.blue/mstc26'
       if (typeof window !== 'undefined') {
         localStorage.setItem('pixelBoofQrUrl', cleaned)
       }

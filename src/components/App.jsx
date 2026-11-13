@@ -310,8 +310,8 @@ export default function App() {
         />
       )}
 
-      {/* Dedicated Print Target so Ctrl+P or Print Button always prints the 2-Page Station & Helper Guide */}
-      <div className="hidden print:block">
+      {/* Dedicated Print Target so Ctrl+P or Print Button always prints the 3-Page Station, Helper & Organizer Guide */}
+      <div className="print-sheet-wrapper">
         <StationGuideContent qrUrl={boothQrUrl} />
       </div>
 

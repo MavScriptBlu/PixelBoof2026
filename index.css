@@ -244,32 +244,64 @@ li {
   scrollbar-width: none !important;
 }
 
+.print-sheet-wrapper {
+  display: none;
+}
+
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 0.3in;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
   html,
   body,
-  #root {
+  #root,
+  main {
     background: #ffffff !important;
-    color: #1e293b !important;
+    color: #0f172a !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    overflow: visible !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .no-print,
+  main > :not(.print-sheet-wrapper) {
+    display: none !important;
+  }
+  .print-sheet-wrapper {
+    display: block !important;
+    width: 100% !important;
     height: auto !important;
     overflow: visible !important;
-  }
-  .no-print {
-    display: none !important;
   }
   #view-guide {
     display: block !important;
     overflow: visible !important;
+    width: 100% !important;
   }
   .print-page {
     box-shadow: none !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
+    padding: 0.15in 0.2in !important;
     width: 100% !important;
-    page-break-after: always;
-    break-after: page;
+    max-width: 100% !important;
+    border-top-width: 8px !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
   .print-page.last-print-page {
-    page-break-after: auto;
-    break-after: auto;
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 }
 

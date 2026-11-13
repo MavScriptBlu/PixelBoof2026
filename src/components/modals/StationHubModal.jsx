@@ -41,10 +41,12 @@ export function downloadStandaloneGuideHtml(qrUrl = DEFAULT_BOOTH_QR_URL) {
     body { font-family: 'Inter', sans-serif; background: #cbd5e1; color: #0f172a; margin: 0; padding: 24px 12px; }
     .pixel-font { font-family: 'Press Start 2P', monospace; }
     @media print {
-      body { background: #ffffff !important; padding: 0 !important; }
+      @page { size: letter portrait; margin: 0.3in; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: #ffffff !important; padding: 0 !important; margin: 0 !important; }
       .no-print { display: none !important; }
-      .print-page { box-shadow: none !important; margin: 0 !important; width: 100% !important; page-break-after: always; break-after: page; }
-      .print-page.last-print-page { page-break-after: auto; break-after: auto; }
+      .print-page { box-shadow: none !important; margin: 0 !important; padding: 0.15in 0.2in !important; width: 100% !important; max-width: 100% !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; break-inside: avoid !important; }
+      .print-page.last-print-page { page-break-after: auto !important; break-after: auto !important; }
     }
   </style>
 </head>
@@ -326,6 +328,13 @@ export function StationGuideContent({qrUrl = DEFAULT_BOOTH_QR_URL, onPrint}) {
   }
 
   const handlePrint = () => {
+    const inIframe = typeof window !== 'undefined' && window.self !== window.top
+    if (inIframe) {
+      showToast(
+        'If preview blocks printing, click DOWNLOAD STANDALONE HTML and open in a browser tab!',
+        'info'
+      )
+    }
     if (onPrint) {
       onPrint()
     } else {
